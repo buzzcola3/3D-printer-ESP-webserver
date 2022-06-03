@@ -1,0 +1,24 @@
+:root{
+    --grid_gap: 8px;
+    --grid_width: 50px;
+    --grid_height: 50px;
+}
+
+.grid{
+    display: grid;
+    justify-items: center;
+    grid-template-columns: repeat(auto-fill, var(--grid_width));
+    grid-template-rows: repeat(10, var(--grid_height));
+    width: 100%;
+    height: 100%;
+    gap: var(--grid_gap);
+    overflow: auto;
+    position: relative;
+    /* grid-auto-flow: ; */
+}
+
+.grid-1x1{
+    grid-column: span 1;
+    width: var(--grid_width);
+    height: var(--grid_height);
+}
