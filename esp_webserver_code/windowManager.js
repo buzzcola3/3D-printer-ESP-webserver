@@ -33,11 +33,12 @@ var ManageGrid = {
             gridClass += '{\r';
             gridClass += 'display: grid;\r';
             gridClass += 'justify-items: center;\r';
-            gridClass += 'grid-template-columns: repeat(' + width + ', var(--grid_width));\r';
-            gridClass += 'grid-template-rows: repeat('+ height +', var(--grid_height));\r';
+            gridClass += 'grid-template-columns: repeat(' + width + ',' + gridSize.width + sizeUnit + ');\r';
+            gridClass += 'grid-template-rows: repeat('+ height +',' + gridSize.height + sizeUnit + ');\r';
             gridClass += 'width: 100%;\r';
             gridClass += 'height: 100%;\r';
-            gridClass += 'gap: var(--grid_gap);\r';
+            gridClass += 'row-gap:' + gridSize.leftGap + sizeUnit + ';\r';
+            gridClass += 'column-gap:' + gridSize.topGap + sizeUnit + ';\r';
             gridClass += 'overflow: auto;\r';
             gridClass += 'position: relative;\r';
             gridClass += '}\r';
@@ -183,7 +184,8 @@ function cursorPositionToGridPosition(x, y){
     let i = 0;
     while(1){
         if(i > (currentGridSize.width)-1){break;}
-        if(x<50+(i*58) && x>0+(i*58)){gridPos.X = (i+1); break;}
+        //if(x<50+(i*58) && x>0+(i*58)){gridPos.X = (i+1); break;}
+        if(x<gridSize.width+(i*(gridSize.width+gridSize.leftGap)) && x>0+(i*(gridSize.width+gridSize.leftGap))){gridPos.X = (i+1); break;} //lol
         i++;
     }
 
@@ -192,7 +194,7 @@ function cursorPositionToGridPosition(x, y){
     i = 0;
     while(1){
         if(i > (currentGridSize.height)-1){break;}
-        if(y<50+(i*58) && y>0+(i*58)){gridPos.Y = (i+1); break;}
+        if(y<gridSize.height+(i*(gridSize.height+gridSize.topGap)) && y>0+(i*(gridSize.height+gridSize.topGap))){gridPos.Y = (i+1); break;} //lol2
         i++;
     }
 
@@ -201,16 +203,6 @@ function cursorPositionToGridPosition(x, y){
     //console.log(gridPos)
     return gridPos;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -594,23 +586,7 @@ function checkAspectRatio(index){
         i++;
     }
 
-
-
-
-
-    
     console.warn('wrong aspectRatio');
-
-    //let ratioMultiplier = targetHeight/targetAspectRatioWidth;
-    //console.log(ratioMultiplier)
-
-    //targetWidth = targetAspectRatioWidth * ratioMultiplier;
-    //targetHeight = targetAspectRatioHeight * ratioMultiplier;
-
-    //console.log(targetHeight);
-    //console.log(targetWidth);
-    //widgetList[index].Width = targetWidth;
-    //widgetList[index].Height = targetHeight;
 }
 
 function getDuplicateWidgetIndex(widget){ //gets indexes of widgets with a same type - returns an array
@@ -726,6 +702,7 @@ var ManageDiv = {
             },
         },
     },
+
     existing: {
         css: {
             replaceCode: function(cssCode, newCssCode, cssElementID){
