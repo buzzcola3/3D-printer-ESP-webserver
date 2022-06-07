@@ -20,8 +20,8 @@ const gridSize = {
 
 
 
-ManageGrid.main.update.size();
-window.onresize = ManageGrid.main.update.size;
+//ManageGrid.main.update.size();
+//window.onresize = ManageGrid.main.update.size;
 
 
 function getGridPositionClass(index){ //.grid_Xmin-Xmax_Ymin-Ymax
@@ -73,9 +73,9 @@ function cursorPositionToGridPosition(x, y){
 
 
 
-let widgetList = []
+export let widgetList = []
 
-function createWidget(widget, height, width, posX, posY){
+export function createWidget(widget, height, width, posX, posY){
     let index = getIndex_addToList(widget, height, width, posX, posY);
     checkAspectRatio(index);
     checkFixInputSize(index);
@@ -99,7 +99,7 @@ function createWidget(widget, height, width, posX, posY){
 }
 
 
-function removeWidget(index){
+export function removeWidget(index){
     removeWidgetDiv(index);
     removeGridPositionClass(index);
     widgetList[index].WidgetData.jsUnsetup();
@@ -108,7 +108,7 @@ function removeWidget(index){
     removeFromWidgetList(index);
 }
 
-function moveWidget(index, newTopLeftPosition){
+export function moveWidget(index, newTopLeftPosition){
     let width = widgetList[index].Width
     let height = widgetList[index].Height
     let oldTopLeftPosition = widgetList[index].TopLeftPosition
@@ -125,7 +125,7 @@ function moveWidget(index, newTopLeftPosition){
     ManageCss.byId.replace(oldPositionClassName, newPositionClassName, 'widgetID_' + index)
 }
 
-function rotateWidget(index, position){ //position = default, rotated
+export function rotateWidget(index, position){ //position = default, rotated
     if(position == 'default' && widgetList[index].rotated == 0){return;}
     if(position == 'rotated' && widgetList[index].rotated == 1){return;}
 
@@ -466,7 +466,7 @@ function getDuplicateWidgetIndex(widget){ //gets indexes of widgets with a same 
     return -1;
 }
 
-//----------------generic functions--------------
+
 
 
 

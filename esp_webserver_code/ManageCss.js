@@ -8,7 +8,7 @@ export var ManageCss = {
             let oldString = oldClassText.slice(oldClassText.indexOf('.' + className))
         
             newString += oldString.slice(oldString.indexOf('}')+1)
-            document.getElementById(cssElementID).innerHTML = newString;
+            document.getElementById(cssElementID).innerHTML = newString.slice(0,-1);
         },
 
         removeMultiple: function(classNames, cssElementID){

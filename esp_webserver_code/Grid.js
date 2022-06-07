@@ -10,48 +10,55 @@ var gridSize = {
     width: 50,
 }
 
+var targetGridElement = 'gridStyle';
+
 var currentGridSize = {width: undefined, height: undefined}
 
 export var ManageGrid = {
     main: {
-        modify: {
-            size: function(){
-                let height = ManageGrid.main.get.height();
-                let width = ManageGrid.main.get.width();
-                ManageGrid.main.create(height, width, 'gridStyle');
-            
-                currentGridSize.width = width;
-                currentGridSize.height = height;
-            },
-        },
 
-        create: function(height, width, parentDivId){
-            let gridClass = '.grid';
-            if(document.getElementById('gridStyle').innerText.includes(gridClass + '{') == true){ManageCss.byId.remove(gridClass.slice(1) + '{', parentDivId);}
+        create: function(parentDivId, targetCssID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit = 'px'){
+            let height = ManageGrid.main.get.height(parentDivId, gridSegmentHeight, gridSegmentTopGap);
+            let width = ManageGrid.main.get.width(parentDivId,  gridSegmentWidth, gridSegmentLeftGap);
+
+            if (document.getElementById(targetCssID) === null){
+                let newEl = document.createElement('style');
+                newEl.id = targetCssID;
+                document.getElementsByTagName('head')[0].appendChild(newEl);
+            }
+
+            let gridClass = '.grid_' + parentDivId;
+            let cssClassName = gridClass.slice(1);
+
+            if(document.getElementById(targetCssID).innerText.includes(gridClass + '{') == true){ManageCss.byId.remove(gridClass.slice(1) + '{', targetCssID);}
         
             gridClass += '{\r';
             gridClass += 'display: grid;\r';
             gridClass += 'justify-items: center;\r';
-            gridClass += 'grid-template-columns: repeat(' + width + ',' + gridSize.width + sizeUnit + ');\r';
-            gridClass += 'grid-template-rows: repeat('+ height +',' + gridSize.height + sizeUnit + ');\r';
+            gridClass += 'grid-template-columns: repeat(' + width + ',' + gridSegmentWidth + sizeUnit + ');\r';
+            gridClass += 'grid-template-rows: repeat('+ height +',' + gridSegmentHeight + sizeUnit + ');\r';
             gridClass += 'width: 100%;\r';
             gridClass += 'height: 100%;\r';
-            gridClass += 'row-gap:' + gridSize.leftGap + sizeUnit + ';\r';
-            gridClass += 'column-gap:' + gridSize.topGap + sizeUnit + ';\r';
+            gridClass += 'row-gap:' + gridSegmentLeftGap + sizeUnit + ';\r';
+            gridClass += 'column-gap:' + gridSegmentTopGap + sizeUnit + ';\r';
             gridClass += 'overflow: auto;\r';
             gridClass += 'position: relative;\r';
             gridClass += '}\r';
         
-            let grid = document.getElementById(parentDivId);
+            let grid = document.getElementById(targetCssID);
             grid.innerHTML += gridClass;
-            return;
+
+            document.getElementById(parentDivId).classList.add(cssClassName);
+            return cssClassName;
         },
 
         update: {
-            size: function(){
-                let height = ManageGrid.main.get.height();
-                let width = ManageGrid.main.get.width();
-                ManageGrid.main.create(height, width, 'gridStyle');
+            size: function(parentDivId, targetCssID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit){
+
+                let height = ManageGrid.main.get.height(parentDivId, gridSegmentHeight, gridSegmentTopGap);
+                let width = ManageGrid.main.get.width(parentDivId, gridSegmentWidth, gridSegmentLeftGap);
+
+                ManageGrid.main.create(parentDivId, targetCssID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit);
             
                 currentGridSize.width = width;
                 currentGridSize.height = height;
@@ -59,27 +66,29 @@ export var ManageGrid = {
         },
 
         get: {
-            height: function(){
-                let displayHeight = window.innerHeight;
+            height: function(elementID, gridSegmentHeight, gridSegmentTopGap){
+                //let displayHeight = window.innerHeight;
+                let displayHeight = document.getElementById(elementID).clientHeight;
                 let i = 0;
                 while(1){
-                    if(displayHeight - (gridSize.height + gridSize.topGap) < (gridSize.height + gridSize.topGap)){break;}
-                    displayHeight = displayHeight - (gridSize.height + gridSize.topGap);
+                    if(displayHeight - (gridSegmentHeight + gridSegmentTopGap) < (gridSegmentHeight + gridSegmentTopGap)){break;}
+                    displayHeight = displayHeight - (gridSegmentHeight + gridSegmentTopGap);
                     i++;
                 }
-                if(displayHeight > gridSize.height + (2*gridSize.topGap)){i++;}
+                if(displayHeight > gridSegmentHeight + (2*gridSegmentTopGap)){i++;}
                 return i;
             },
 
-            width: function(){
-                let displayWidth = window.innerWidth;
+            width: function(elementID, gridSegmentWidth, gridSegmentLeftGap){
+                //let displayWidth = window.innerWidth;
+                let displayWidth = document.getElementById(elementID).clientWidth;
                 let i = 0;
                 while(1){
-                    if(displayWidth - (gridSize.width + gridSize.leftGap) < (gridSize.width + gridSize.leftGap)){break;}
-                    displayWidth = displayWidth - (gridSize.width + gridSize.leftGap);
+                    if(displayWidth - (gridSegmentWidth + gridSegmentLeftGap) < (gridSegmentWidth + gridSegmentLeftGap)){break;}
+                    displayWidth = displayWidth - (gridSegmentWidth + gridSegmentLeftGap);
                     i++;
                 }
-                if(displayWidth > gridSize.width + (2*gridSize.leftGap)){i++;}
+                if(displayWidth > gridSegmentWidth + (2*gridSegmentLeftGap)){i++;}
                 return i;
             },
         },
@@ -88,7 +97,7 @@ export var ManageGrid = {
     create: {
         css: {
             sizeClass: function(width, height){ //user
-                let targetElementID = 'gridStyle';
+                let targetElementID = targetGridElement;
 
                 let cssCode = '.grid_' + width + 'x' + height;
             
@@ -112,7 +121,7 @@ export var ManageGrid = {
     remove: {
         css: {
             sizeClass: function(gridCssClassName){
-                let styleElementID = 'gridStyle';
+                let styleElementID = targetGridElement;
                 ManageCss.byId.remove(gridCssClassName, styleElementID);
             },
         },
@@ -130,7 +139,7 @@ export var ManageGrid = {
             let ymin = TopLeftPosition.Y;
             let ymax = ymin + height;
         
-            let targetElementID = 'gridStyle';
+            let targetElementID = targetGridElement;
         
             
             let cssCode = '.grid_' + xmin + '-' + xmax + '_' + ymin + '-' + ymax;

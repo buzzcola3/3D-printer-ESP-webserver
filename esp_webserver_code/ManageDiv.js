@@ -1,3 +1,5 @@
+import {ManageCss} from "./ManageCss.js";
+
 export var ManageDiv = {
     passed: {
         image: {
@@ -19,7 +21,7 @@ export var ManageDiv = {
             },
         },
         css: {
-            addCode: function f(element, cssCode, cssElementID){
+            addCode: function(element, cssCode, cssElementID){
                 let cssClassName = ManageDiv.internal.cssCodeToCssClassName(cssCode);
                 
                 ManageCss.byId.create( '.' + cssClassName + '{' + cssCode + ';}', cssElementID)
