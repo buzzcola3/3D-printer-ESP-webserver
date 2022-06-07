@@ -76,12 +76,12 @@ function cursorPositionToGridPosition(x, y){
 export let widgetList = []
 
 export function createWidget(widget, height, width, posX, posY){
-    let index = getIndex_addToList(widget, height, width, posX, posY);
-    checkAspectRatio(index);
-    checkFixInputSize(index);
+    let index = getIndex_addToList(widget, height, width, posX, posY);//
+    checkAspectRatio(index);//
+    checkFixInputSize(index);//
     
 
-    getGridPositionClass(index);
+    getGridPositionClass(index);//
 
     let newWidgetDiv;
     newWidgetDiv = createWidgetContent(index);

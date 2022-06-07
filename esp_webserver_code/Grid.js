@@ -128,7 +128,7 @@ export var ManageGrid = {
     },
 
     get: {
-        positionClass: function(TopLeftPosition, width, height){//.grid_Xmin-Xmax_Ymin-Ymax
+        positionClass: function(parentStyleId, TopLeftPosition, width, height){//.grid_Xmin-Xmax_Ymin-Ymax
             if(width === undefined){return undefined;}
             if(height === undefined){return undefined;}
             if(TopLeftPosition.X === undefined){return undefined;}
@@ -139,12 +139,10 @@ export var ManageGrid = {
             let ymin = TopLeftPosition.Y;
             let ymax = ymin + height;
         
-            let targetElementID = targetGridElement;
-        
             
             let cssCode = '.grid_' + xmin + '-' + xmax + '_' + ymin + '-' + ymax;
             let className = cssCode.slice(1); //grid_X-X_X-X
-            if(document.getElementById(targetElementID).innerText.includes(cssCode) == true){return className;}
+            if(document.getElementById(parentStyleId).innerText.includes(cssCode) == true){return className;}
         
         
             cssCode += '{\r';
@@ -157,7 +155,7 @@ export var ManageGrid = {
             cssCode += 'transition: 1s';
             cssCode += '}';
         
-            ManageCss.byId.create(cssCode, targetElementID);
+            ManageCss.byId.create(cssCode, parentStyleId);
         
             return className;
         }, 
