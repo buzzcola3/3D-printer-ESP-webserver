@@ -2,6 +2,9 @@ import {ManageCss} from "./ManageCss.js";
 import {ManageDiv} from "./ManageDiv.js";
 import {ManageGrid} from "./grid.js";
 
+//test
+var printerPowerStatus = 1;
+//!test
 
 class WidgetsOnGrid{
     constructor(targetDivID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit = 'px'){
@@ -38,7 +41,20 @@ class WidgetsOnGrid{
         let index = WidgetsOnGrid.getListId(this.widgetList, widget, height, width, posX, posY);
         WidgetsOnGrid.checkFixInputSize(this.widgetList, index);
         WidgetsOnGrid.getGridPositionClass(this.targetCssID, this.widgetList, index);
+
+        let newWidgetDiv;
+        newWidgetDiv = WidgetsOnGrid.createWidgetContent(this.widgetList, index);
+        newWidgetDiv = WidgetsOnGrid.appendWidgetID(newWidgetDiv, this.widgetList, index);
+        newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, this.widgetList, index);
+        newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, this.widgetList, index);
+        WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, this.targetDivID);
+
+        this.widgetList[index].WidgetData.jsSetup();
+                
+        console.log(newWidgetDiv);
     }
+
+    static gridInstances = [];
 
     static resizeHandler(){ //mainGrid
         let i = 0;
@@ -58,8 +74,6 @@ class WidgetsOnGrid{
         let gridClassName = ManageGrid.get.positionClass(targetCssID, topLeft, width, height);
         widgetList[index].gridPositionClass = gridClassName;
     }
-
-    static gridInstances = []
 
     static getListId(widgetList, widget, height, width, posX, posY){
         console.log(widgetList);
@@ -86,6 +100,55 @@ class WidgetsOnGrid{
         }
         widgetList[id].WidgetData = WidgetsOnGrid.getWidgetData(widgetList, widget, id);
         return id;
+    }
+
+    static createWidgetContent(widgetList, index){
+        let widgetStructure = widgetList[index].WidgetData.widgetStructure();
+        if(widgetStructure === undefined){return document.createElement('div');}
+        return widgetStructure;
+    }
+
+    static appendWidgetID(newWidgetDiv, widgetList, index){
+
+        newWidgetDiv.id = 'widgetID_' + index;
+    
+        if(widgetList[index].duplicateOf != -1){
+            newWidgetDiv.classList.add('widgetID_' + widgetList[index].duplicateOf);
+        }
+        if(widgetList[index].duplicateOf == -1){
+            newWidgetDiv.classList.add('widgetID_' + index)
+        }
+        return newWidgetDiv;
+    }
+
+    static appendWidgetSize(newWidgetDiv, widgetList, index){
+        newWidgetDiv.classList.add(widgetList[index].gridPositionClass);
+        return newWidgetDiv;
+    }
+
+    static appendElementAttributes(currentDiv, widgetList, index){
+        let code = widgetList[index].WidgetData.divHTML;
+        
+        if(code.indexOf('=') == -1){return -1;}
+    
+        while(1){
+            let currentAtt = code.slice(0, code.indexOf('='));
+            code = code.slice(code.indexOf('='));
+            code = code.slice(code.indexOf('"')+1);
+            
+            let currentAttVal = code.slice(0, code.indexOf('"'));
+            code = code.slice(code.indexOf('"')+1);
+    
+            currentDiv.setAttribute(currentAtt, currentAttVal);
+            if(code.indexOf('=') == -1){break;}
+            
+        }
+        return currentDiv;
+    }
+
+    static placeDivOnScreen(currentDiv, targetElementID){
+        console.log(currentDiv);
+        document.getElementById(targetElementID).appendChild(currentDiv);
     }
 
     static checkFixInputSize(widgetList, index){

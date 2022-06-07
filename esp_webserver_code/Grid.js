@@ -46,7 +46,11 @@ export var ManageGrid = {
             gridClass += '}\r';
         
             let grid = document.getElementById(targetCssID);
-            grid.innerHTML += gridClass;
+            gridClass += grid.innerHTML;
+            grid.innerHTML = gridClass;
+
+            //grid.innerHTML += gridClass;
+            console.log(document.getElementById(targetCssID))
 
             document.getElementById(parentDivId).classList.add(cssClassName);
             return cssClassName;

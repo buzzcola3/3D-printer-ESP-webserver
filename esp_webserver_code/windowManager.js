@@ -84,12 +84,12 @@ export function createWidget(widget, height, width, posX, posY){
     getGridPositionClass(index);//
 
     let newWidgetDiv;
-    newWidgetDiv = createWidgetContent(index);
-    newWidgetDiv = appendWidgetID(newWidgetDiv, index);
-    newWidgetDiv = appendWidgetSize(newWidgetDiv, index);
-    newWidgetDiv = appendElementAttributes(newWidgetDiv, index)
+    newWidgetDiv = createWidgetContent(index);//
+    newWidgetDiv = appendWidgetID(newWidgetDiv, index);//
+    newWidgetDiv = appendWidgetSize(newWidgetDiv, index);//
+    newWidgetDiv = appendElementAttributes(newWidgetDiv, index)//
 
-    placeDivOnScreen(newWidgetDiv, 'mainDiv');
+    placeDivOnScreen(newWidgetDiv, 'mainDiv');//
     
     widgetList[index].WidgetData.jsSetup();
 
