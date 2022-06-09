@@ -38,9 +38,9 @@ class WidgetsOnGrid{
     widgetList = []
 
     create(widget, height, width, posX, posY){
-        let index = WidgetsOnGrid.getListId(this.widgetList, widget, height, width, posX, posY);
+        let index = WidgetsOnGrid.getListId(this.widgetList, widget, height, width, posX, posY, this.gridSegmentWidth, this.gridSegmentHeight, this.gridSegmentLeftGap, this.gridSegmentTopGap, this.targetCssID);
         WidgetsOnGrid.checkFixInputSize(this.widgetList, index);
-        WidgetsOnGrid.getGridPositionClass(this.targetCssID, this.widgetList, index);
+        WidgetsOnGrid.getGridPositionClass(this.targetCssID, this.widgetList, index, this.gridSegmentWidth, this.gridSegmentHeight, this.gridSegmentLeftGap, this.gridSegmentTopGap);
 
         let newWidgetDiv;
         newWidgetDiv = WidgetsOnGrid.createWidgetContent(this.widgetList, index);
@@ -51,8 +51,9 @@ class WidgetsOnGrid{
 
         this.widgetList[index].WidgetData.jsSetup();
                 
-        console.log(newWidgetDiv);
+        console.log(this);
     }
+
 
     static gridInstances = [];
 
@@ -66,16 +67,17 @@ class WidgetsOnGrid{
         console.log(WidgetsOnGrid.gridInstances)
     }
 
-    static getGridPositionClass(targetCssID, widgetList, index){
+    static getGridPositionClass(targetCssID, widgetList, index, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap){
         let height = widgetList[index].Height;
         let width = widgetList[index].Width;
         let topLeft = widgetList[index].TopLeftPosition;
     
-        let gridClassName = ManageGrid.get.positionClass(targetCssID, topLeft, width, height);
+        let gridClassName = ManageGrid.get.positionClass(targetCssID, topLeft, width, height, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap);
         widgetList[index].gridPositionClass = gridClassName;
     }
 
-    static getListId(widgetList, widget, height, width, posX, posY){
+
+    static getListId(widgetList, widget, height, width, posX, posY, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap, targetCssID){
         console.log(widgetList);
         let newWidget = {
             Index: undefined,
@@ -98,8 +100,25 @@ class WidgetsOnGrid{
             }
             id++;
         }
-        widgetList[id].WidgetData = WidgetsOnGrid.getWidgetData(widgetList, widget, id);
+
+        widgetList[id].WidgetData = WidgetsOnGrid.getWidgetData(widgetList, widget, id, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap, targetCssID);
+        WidgetsOnGrid.widgetCode.push({widget: widget, code: widgetList[id].WidgetData.jsFunction});
+
+        console.log(WidgetsOnGrid.widgetCode)
         return id;
+    }
+
+    static widgetCode = [];
+
+    static runWidgetCode(widgetName){
+        console.log('widgetClicked: ' + widgetName)
+        let i = 0;
+        while(1){
+            if(WidgetsOnGrid.widgetCode[i] === undefined){return;}
+            if(WidgetsOnGrid.widgetCode[i].widget == widgetName){break;}
+            i++;
+        }
+        WidgetsOnGrid.widgetCode[i].code();
     }
 
     static createWidgetContent(widgetList, index){
@@ -128,20 +147,33 @@ class WidgetsOnGrid{
 
     static appendElementAttributes(currentDiv, widgetList, index){
         let code = widgetList[index].WidgetData.divHTML;
-        
+
         if(code.indexOf('=') == -1){return -1;}
-    
+
+        let attName = code.slice(0, code.indexOf('='))
+
+        code = code.slice(code.indexOf('=')+1)
+
+        let endChar = 0;
+        let i = 0;
         while(1){
-            let currentAtt = code.slice(0, code.indexOf('='));
-            code = code.slice(code.indexOf('='));
-            code = code.slice(code.indexOf('"')+1);
-            
-            let currentAttVal = code.slice(0, code.indexOf('"'));
-            code = code.slice(code.indexOf('"')+1);
+            if(code.charAt(i) == ''){break;}
+            while(1){
+                if(code.charAt(i) == ''){break;}
     
-            currentDiv.setAttribute(currentAtt, currentAttVal);
-            if(code.indexOf('=') == -1){break;}
+                if(code.charAt(i) == '('){
+                    while(1){
+                        if(code.charAt(i) == ')'){break;}
+                        i++;
+                        if(code.charAt(i) == ''){console.warn('element attribute syntax Error'); break;}
+                    }
+                }
+                if(code.charAt(i) == '"'){endChar = i; currentDiv.setAttribute(attName, code.slice(0+1,i));}
+                i++;
+            }
             
+            code = code.slice(endChar+1);
+            i++;
         }
         return currentDiv;
     }
@@ -196,7 +228,7 @@ class WidgetsOnGrid{
         console.warn('wrong aspectRatio');
     }
 
-    static getWidgetData(widgetList, name, index){
+    static getWidgetData(widgetList, name, index, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap, targetCssID){
         function widgetStructure(){}
         function jsFunction(){}
         function jsSetup(){}
@@ -236,7 +268,7 @@ class WidgetsOnGrid{
                 if(printerPowerStatus == 0){ManageDiv.existing.css.replaceCode('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
             }
     
-            widget.divHTML = 'onclick="widgetList[' + index + '].WidgetData.jsFunction()"'
+            widget.divHTML = 'onclick="WidgetsOnGrid.runWidgetCode(' + ('"' + name + '"') + ')"'
     
             return widget;
         }
@@ -252,13 +284,13 @@ class WidgetsOnGrid{
                 div[2] = document.createElement('div');
                 div[2] = ManageDiv.passed.css.addCode(div[2], 'font-weight: 700', 'widgetsStyle');
                 div[2] = ManageDiv.passed.css.addCode(div[2], 'text-align: center', 'widgetsStyle');
-                div[2] = ManageDiv.passed.css.addCode(div[2], 'line-height: ' + gridSize.height + 'px', 'widgetsStyle');
+                div[2] = ManageDiv.passed.css.addCode(div[2], 'line-height: ' + gridSegmentHeight + 'px', 'widgetsStyle');
                 div[2].innerText = "50°C";
-                div[2].classList.add(ManageGrid.create.css.sizeClass(1,1));
+                div[2].classList.add(ManageGrid.create.css.sizeClass(1, 1, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap, targetCssID));
     
                 div[1] = document.createElement('img');
                 div[1].src = "./extruderIcon.svg";
-                div[1].classList.add(ManageGrid.create.css.sizeClass(1,1));
+                div[1].classList.add(ManageGrid.create.css.sizeClass(1, 1, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap,targetCssID));
     
                 div[0] = document.createElement('div');
                 div[0] = ManageDiv.passed.css.addCode(div[0], 'background-color: white', 'widgetsStyle');
@@ -349,9 +381,10 @@ class WidgetsOnGrid{
         return widget;
     }
 }
+window.WidgetsOnGrid = WidgetsOnGrid;
 
 let fff = new WidgetsOnGrid('mainDiv', 50, 50, 8, 8, 'px')
-let ffg = new WidgetsOnGrid('mainDiv1', 25, 25, 4, 4, 'px')
+//let ffg = new WidgetsOnGrid('mainDiv1', 25, 25, 4, 4, 'px')
 
 fff.create('powerButton', 2, 2, 4, 4);
 console.log(fff.widgetList)

@@ -100,23 +100,23 @@ export var ManageGrid = {
 
     create: {
         css: {
-            sizeClass: function(width, height){ //user
-                let targetElementID = targetGridElement;
+            sizeClass: function(width, height, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap, targetCssID){ //user
+                console.log(targetCssID)
 
                 let cssCode = '.grid_' + width + 'x' + height;
             
                 let name = cssCode.slice(1);
                 
-                if(document.getElementById(targetElementID).innerText.includes(cssCode)){return name;}
+                if(document.getElementById(targetCssID).innerText.includes(cssCode)){return name;}
             
                 cssCode += '{\r';
                 cssCode += 'grid-row-span: ' + width + ';\r'; 
                 cssCode += 'grid-column-span: ' + height + ';\r';
-                cssCode += 'height: ' + ( (gridSize.height * height) + (gridSize.topGap * (height-1)) ) + sizeUnit + ';\r';
-                cssCode += 'width: ' + ( (gridSize.width * width) + (gridSize.leftGap * (width-1)) ) + sizeUnit + ';\r';
+                cssCode += 'height: ' + ( (gridSegmentHeight * height) + (gridSegmentTopGap * (height-1)) ) + sizeUnit + ';\r';
+                cssCode += 'width: ' + ( (gridSegmentWidth * width) + (gridSegmentLeftGap * (width-1)) ) + sizeUnit + ';\r';
                 cssCode += '}'
             
-                ManageCss.byId.create(cssCode, targetElementID);
+                ManageCss.byId.create(cssCode, targetCssID);
                 return name;
             },
         },
@@ -132,7 +132,7 @@ export var ManageGrid = {
     },
 
     get: {
-        positionClass: function(parentStyleId, TopLeftPosition, width, height){//.grid_Xmin-Xmax_Ymin-Ymax
+        positionClass: function(parentStyleId, TopLeftPosition, width, height, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap){//.grid_Xmin-Xmax_Ymin-Ymax
             if(width === undefined){return undefined;}
             if(height === undefined){return undefined;}
             if(TopLeftPosition.X === undefined){return undefined;}
@@ -150,8 +150,8 @@ export var ManageGrid = {
         
         
             cssCode += '{\r';
-            cssCode += 'height: ' + ( (gridSize.height * height) + (gridSize.topGap * (height-1)) ) + sizeUnit + ';\r';
-            cssCode += 'width: ' + ( (gridSize.width * width) + (gridSize.leftGap * (width-1)) ) + sizeUnit + ';\r';
+            cssCode += 'height: ' + ( (gridSegmentHeight * height) + (gridSegmentTopGap * (height-1)) ) + sizeUnit + ';\r';
+            cssCode += 'width: ' + ( (gridSegmentWidth * width) + (gridSegmentLeftGap * (width-1)) ) + sizeUnit + ';\r';
             cssCode += 'grid-row-start: ' + ymin + ';\r';
             cssCode += 'grid-row-end: ' + ymax + ';\r';
             cssCode += 'grid-column-start: ' + xmin + ';\r';
