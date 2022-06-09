@@ -1,68 +1,57 @@
 import {ManageCss} from "./ManageCss.js";
 
-
-var sizeUnit = 'px';
-
-var gridSize = {
-    leftGap: 8,
-    topGap: 8,
-    height: 50,
-    width: 50,
-}
-
-var targetGridElement = 'gridStyle';
-
 var currentGridSize = {width: undefined, height: undefined}
 
 export var ManageGrid = {
     main: {
 
-        create: function(parentDivId, targetCssID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit = 'px'){
-            let height = ManageGrid.main.get.height(parentDivId, gridSegmentHeight, gridSegmentTopGap);
-            let width = ManageGrid.main.get.width(parentDivId,  gridSegmentWidth, gridSegmentLeftGap);
+        create: function(instance){
 
-            if (document.getElementById(targetCssID) === null){
+            let height = ManageGrid.main.get.height(instance);
+            let width = ManageGrid.main.get.width(instance);
+
+            if (document.getElementById(instance.targetCssID) === null){
                 let newEl = document.createElement('style');
-                newEl.id = targetCssID;
+                newEl.id = instance.targetCssID;
                 document.getElementsByTagName('head')[0].appendChild(newEl);
             }
 
-            let gridClass = '.grid_' + parentDivId;
+            let gridClass = '.grid_' + instance.targetDivID;
             let cssClassName = gridClass.slice(1);
 
-            if(document.getElementById(targetCssID).innerText.includes(gridClass + '{') == true){ManageCss.byId.remove(gridClass.slice(1) + '{', targetCssID);}
+            if(document.getElementById(instance.targetCssID).innerText.includes(gridClass + '{') == true){ManageCss.byId.remove(gridClass.slice(1) + '{', instance.targetCssID);}
         
             gridClass += '{\r';
             gridClass += 'display: grid;\r';
             gridClass += 'justify-items: center;\r';
-            gridClass += 'grid-template-columns: repeat(' + width + ',' + gridSegmentWidth + sizeUnit + ');\r';
-            gridClass += 'grid-template-rows: repeat('+ height +',' + gridSegmentHeight + sizeUnit + ');\r';
+            gridClass += 'grid-template-columns: repeat(' + width + ',' + instance.gridSegmentWidth + instance.sizeUnit + ');\r';
+            gridClass += 'grid-template-rows: repeat('+ height +',' + instance.gridSegmentHeight + instance.sizeUnit + ');\r';
             gridClass += 'width: 100%;\r';
             gridClass += 'height: 100%;\r';
-            gridClass += 'row-gap:' + gridSegmentLeftGap + sizeUnit + ';\r';
-            gridClass += 'column-gap:' + gridSegmentTopGap + sizeUnit + ';\r';
+            gridClass += 'row-gap:' + instance.gridSegmentLeftGap + instance.sizeUnit + ';\r';
+            gridClass += 'column-gap:' + instance.gridSegmentTopGap + instance.sizeUnit + ';\r';
             gridClass += 'overflow: auto;\r';
             gridClass += 'position: relative;\r';
             gridClass += '}\r';
         
-            let grid = document.getElementById(targetCssID);
+            let grid = document.getElementById(instance.targetCssID);
             gridClass += grid.innerHTML;
             grid.innerHTML = gridClass;
 
             //grid.innerHTML += gridClass;
-            console.log(document.getElementById(targetCssID))
+            console.log(document.getElementById(instance.targetCssID))
 
-            document.getElementById(parentDivId).classList.add(cssClassName);
+            document.getElementById(instance.targetDivID).classList.add(cssClassName);
             return cssClassName;
         },
 
         update: {
-            size: function(parentDivId, targetCssID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit){
+            size: function(instance){
 
-                let height = ManageGrid.main.get.height(parentDivId, gridSegmentHeight, gridSegmentTopGap);
-                let width = ManageGrid.main.get.width(parentDivId, gridSegmentWidth, gridSegmentLeftGap);
+                let height = ManageGrid.main.get.height(instance);
+                let width = ManageGrid.main.get.width(instance);
 
-                ManageGrid.main.create(parentDivId, targetCssID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit);
+                ManageGrid.main.create(instance);
             
                 currentGridSize.width = width;
                 currentGridSize.height = height;
@@ -70,29 +59,29 @@ export var ManageGrid = {
         },
 
         get: {
-            height: function(elementID, gridSegmentHeight, gridSegmentTopGap){
+            height: function(instance){
                 //let displayHeight = window.innerHeight;
-                let displayHeight = document.getElementById(elementID).clientHeight;
+                let displayHeight = document.getElementById(instance.targetDivID).clientHeight;
                 let i = 0;
                 while(1){
-                    if(displayHeight - (gridSegmentHeight + gridSegmentTopGap) < (gridSegmentHeight + gridSegmentTopGap)){break;}
-                    displayHeight = displayHeight - (gridSegmentHeight + gridSegmentTopGap);
+                    if(displayHeight - (instance.gridSegmentHeight + instance.gridSegmentTopGap) < (instance.gridSegmentHeight + instance.gridSegmentTopGap)){break;}
+                    displayHeight = displayHeight - (instance.gridSegmentHeight + instance.gridSegmentTopGap);
                     i++;
                 }
-                if(displayHeight > gridSegmentHeight + (2*gridSegmentTopGap)){i++;}
+                if(displayHeight > instance.gridSegmentHeight + (2*instance.gridSegmentTopGap)){i++;}
                 return i;
             },
 
-            width: function(elementID, gridSegmentWidth, gridSegmentLeftGap){
+            width: function(instance){
                 //let displayWidth = window.innerWidth;
-                let displayWidth = document.getElementById(elementID).clientWidth;
+                let displayWidth = document.getElementById(instance.targetDivID).clientWidth;
                 let i = 0;
                 while(1){
-                    if(displayWidth - (gridSegmentWidth + gridSegmentLeftGap) < (gridSegmentWidth + gridSegmentLeftGap)){break;}
-                    displayWidth = displayWidth - (gridSegmentWidth + gridSegmentLeftGap);
+                    if(displayWidth - (instance.gridSegmentWidth + instance.gridSegmentLeftGap) < (instance.gridSegmentWidth + instance.gridSegmentLeftGap)){break;}
+                    displayWidth = displayWidth - (instance.gridSegmentWidth + instance.gridSegmentLeftGap);
                     i++;
                 }
-                if(displayWidth > gridSegmentWidth + (2*gridSegmentLeftGap)){i++;}
+                if(displayWidth > instance.gridSegmentWidth + (2*instance.gridSegmentLeftGap)){i++;}
                 return i;
             },
         },
@@ -100,23 +89,23 @@ export var ManageGrid = {
 
     create: {
         css: {
-            sizeClass: function(width, height, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap, targetCssID){ //user
-                console.log(targetCssID)
+            sizeClass: function(width, height, instance){ //user
+                console.log(instance.targetCssID)
 
                 let cssCode = '.grid_' + width + 'x' + height;
             
                 let name = cssCode.slice(1);
                 
-                if(document.getElementById(targetCssID).innerText.includes(cssCode)){return name;}
+                if(document.getElementById(instance.targetCssID).innerText.includes(cssCode)){return name;}
             
                 cssCode += '{\r';
                 cssCode += 'grid-row-span: ' + width + ';\r'; 
                 cssCode += 'grid-column-span: ' + height + ';\r';
-                cssCode += 'height: ' + ( (gridSegmentHeight * height) + (gridSegmentTopGap * (height-1)) ) + sizeUnit + ';\r';
-                cssCode += 'width: ' + ( (gridSegmentWidth * width) + (gridSegmentLeftGap * (width-1)) ) + sizeUnit + ';\r';
+                cssCode += 'height: ' + ( (instance.gridSegmentHeight * height) + (instance.gridSegmentTopGap * (height-1)) ) + instance.sizeUnit + ';\r';
+                cssCode += 'width: ' + ( (instance.gridSegmentWidth * width) + (instance.gridSegmentLeftGap * (width-1)) ) + instance.sizeUnit + ';\r';
                 cssCode += '}'
             
-                ManageCss.byId.create(cssCode, targetCssID);
+                ManageCss.byId.create(cssCode, instance.targetCssID);
                 return name;
             },
         },
@@ -132,7 +121,7 @@ export var ManageGrid = {
     },
 
     get: {
-        positionClass: function(parentStyleId, TopLeftPosition, width, height, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap){//.grid_Xmin-Xmax_Ymin-Ymax
+        positionClass: function(instance, TopLeftPosition, width, height){//.grid_Xmin-Xmax_Ymin-Ymax
             if(width === undefined){return undefined;}
             if(height === undefined){return undefined;}
             if(TopLeftPosition.X === undefined){return undefined;}
@@ -146,12 +135,12 @@ export var ManageGrid = {
             
             let cssCode = '.grid_' + xmin + '-' + xmax + '_' + ymin + '-' + ymax;
             let className = cssCode.slice(1); //grid_X-X_X-X
-            if(document.getElementById(parentStyleId).innerText.includes(cssCode) == true){return className;}
+            if(document.getElementById(instance.targetCssID).innerText.includes(cssCode) == true){return className;}
         
         
             cssCode += '{\r';
-            cssCode += 'height: ' + ( (gridSegmentHeight * height) + (gridSegmentTopGap * (height-1)) ) + sizeUnit + ';\r';
-            cssCode += 'width: ' + ( (gridSegmentWidth * width) + (gridSegmentLeftGap * (width-1)) ) + sizeUnit + ';\r';
+            cssCode += 'height: ' + ( (instance.gridSegmentHeight * height) + (instance.gridSegmentTopGap * (height-1)) ) + instance.sizeUnit + ';\r';
+            cssCode += 'width: ' + ( (instance.gridSegmentWidth * width) + (instance.gridSegmentLeftGap * (width-1)) ) + instance.sizeUnit + ';\r';
             cssCode += 'grid-row-start: ' + ymin + ';\r';
             cssCode += 'grid-row-end: ' + ymax + ';\r';
             cssCode += 'grid-column-start: ' + xmin + ';\r';
@@ -159,17 +148,9 @@ export var ManageGrid = {
             cssCode += 'transition: 1s';
             cssCode += '}';
         
-            ManageCss.byId.create(cssCode, parentStyleId);
+            ManageCss.byId.create(cssCode, instance.targetCssID);
         
             return className;
         }, 
     },
 };
-
-export function SetupSize(sizeObj){
-    gridSize = sizeObj;
-}
-
-export function SetupSizeUnit(str){
-    sizeUnit = str;
-}

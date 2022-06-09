@@ -20,7 +20,8 @@ class WidgetsOnGrid{
         this.targetCssID = targetCssID;
 
 
-        WidgetsOnGrid.gridInstances.push({
+        WidgetsOnGrid.gridInstances.push({ // ----------------<-----------------<------- USE THIZ
+            widgetList: [],
             targetDivID: targetDivID,
             targetCssID: targetCssID,
             gridSegmentWidth: gridSegmentWidth,
@@ -30,55 +31,70 @@ class WidgetsOnGrid{
             sizeUnit: sizeUnit,
         });
 
+        let instance = WidgetsOnGrid.assignInstanceNumber(targetDivID)
+        this.instance = instance;
+
         window.onresize = WidgetsOnGrid.resizeHandler;
 
-        ManageGrid.main.create(targetDivID, targetCssID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit);
+        ManageGrid.main.create(WidgetsOnGrid.gridInstances[instance]);
     }
 
-    widgetList = []
+    
 
     create(widget, height, width, posX, posY){
-        let index = WidgetsOnGrid.getListId(this.widgetList, widget, height, width, posX, posY, this.gridSegmentWidth, this.gridSegmentHeight, this.gridSegmentLeftGap, this.gridSegmentTopGap, this.targetCssID);
-        WidgetsOnGrid.checkFixInputSize(this.widgetList, index);
-        WidgetsOnGrid.getGridPositionClass(this.targetCssID, this.widgetList, index, this.gridSegmentWidth, this.gridSegmentHeight, this.gridSegmentLeftGap, this.gridSegmentTopGap);
+        let gridInstance = WidgetsOnGrid.gridInstances[this.instance]
+
+        let targetWidgetIndex = WidgetsOnGrid.getListId(widget, height, width, posX, posY, gridInstance);
+        WidgetsOnGrid.checkFixInputSize(gridInstance.widgetList, targetWidgetIndex);
+        WidgetsOnGrid.getGridPositionClass(gridInstance, targetWidgetIndex);
 
         let newWidgetDiv;
-        newWidgetDiv = WidgetsOnGrid.createWidgetContent(this.widgetList, index);
-        newWidgetDiv = WidgetsOnGrid.appendWidgetID(newWidgetDiv, this.widgetList, index);
-        newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, this.widgetList, index);
-        newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, this.widgetList, index);
+        newWidgetDiv = WidgetsOnGrid.createWidgetContent(gridInstance.widgetList, targetWidgetIndex);
+        newWidgetDiv = WidgetsOnGrid.appendWidgetID(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
+        newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
+        newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
         WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, this.targetDivID);
 
-        this.widgetList[index].WidgetData.jsSetup();
-                
-        console.log(this);
+        gridInstance.widgetList[targetWidgetIndex].WidgetData.jsSetup();
     }
 
 
     static gridInstances = [];
 
+    static assignInstanceNumber(targetDivID){
+        let i = 0;
+        
+        while(1){
+            if(WidgetsOnGrid.gridInstances[i].targetDivID === undefined){console.warn('instance could not be assigned'); return -1;}
+            if(WidgetsOnGrid.gridInstances[i].targetDivID == targetDivID){return i;}
+            i++;
+        }
+        
+    }
+
     static resizeHandler(){ //mainGrid
         let i = 0;
         while(1){
             if(WidgetsOnGrid.gridInstances[i] === undefined){break;}
-            ManageGrid.main.update.size(WidgetsOnGrid.gridInstances[i].targetDivID, WidgetsOnGrid.gridInstances[i].targetCssID, WidgetsOnGrid.gridInstances[i].gridSegmentWidth, WidgetsOnGrid.gridInstances[i].gridSegmentHeight, WidgetsOnGrid.gridInstances[i].gridSegmentTopGap, WidgetsOnGrid.gridInstances[i].gridSegmentLeftGap, WidgetsOnGrid.gridInstances[i].sizeUnit);
+            ManageGrid.main.update.size(WidgetsOnGrid.gridInstances[i]);
             i++;
         }
         console.log(WidgetsOnGrid.gridInstances)
     }
 
-    static getGridPositionClass(targetCssID, widgetList, index, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap){
-        let height = widgetList[index].Height;
-        let width = widgetList[index].Width;
-        let topLeft = widgetList[index].TopLeftPosition;
+    static getGridPositionClass(instance, index){
+        let height = instance.widgetList[index].Height;
+        let width = instance.widgetList[index].Width;
+        let topLeft = instance.widgetList[index].TopLeftPosition;
     
-        let gridClassName = ManageGrid.get.positionClass(targetCssID, topLeft, width, height, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap);
-        widgetList[index].gridPositionClass = gridClassName;
+        let gridClassName = ManageGrid.get.positionClass(instance, topLeft, width, height);
+        instance.widgetList[index].gridPositionClass = gridClassName;
     }
 
 
-    static getListId(widgetList, widget, height, width, posX, posY, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap, targetCssID){
-        console.log(widgetList);
+    static getListId(widget, height, width, posX, posY, instance){
+        console.log(instance.widgetList);
+        console.log(instance)
         let newWidget = {
             Index: undefined,
             rotated: 0,
@@ -92,17 +108,16 @@ class WidgetsOnGrid{
     
         let id = 0;
         while(1){
-            //console.log(widgetList[i]);
-            if(typeof widgetList[id] === 'undefined' || widgetList[id].Index == -1){
+            if(typeof instance.widgetList[id] === 'undefined' || instance.widgetList[id].Index == -1){
                 newWidget.Index = id;
-                widgetList[id] = newWidget;
+                instance.widgetList[id] = newWidget;
                 break;
             }
             id++;
         }
 
-        widgetList[id].WidgetData = WidgetsOnGrid.getWidgetData(widgetList, widget, id, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap, targetCssID);
-        WidgetsOnGrid.widgetCode.push({widget: widget, code: widgetList[id].WidgetData.jsFunction});
+        instance.widgetList[id].WidgetData = WidgetsOnGrid.getWidgetData(widget, id, instance);
+        WidgetsOnGrid.widgetCode.push({widget: widget, code: instance.widgetList[id].WidgetData.jsFunction});
 
         console.log(WidgetsOnGrid.widgetCode)
         return id;
@@ -228,7 +243,7 @@ class WidgetsOnGrid{
         console.warn('wrong aspectRatio');
     }
 
-    static getWidgetData(widgetList, name, index, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap, targetCssID){
+    static getWidgetData(name, index, instance){
         function widgetStructure(){}
         function jsFunction(){}
         function jsSetup(){}
@@ -238,8 +253,8 @@ class WidgetsOnGrid{
         let widget = {name: name, sizeLimits: 'unknown', acceptableAspectRatios: [undefined], widgetStructure, jsSetup, jsUnsetup, jsFunction, divHTML}
     
         let allIdenticalWidgets = 'widgetID_'
-        if(widgetList[index].duplicateOf == -1){allIdenticalWidgets += index;}
-        if(widgetList[index].duplicateOf != -1){allIdenticalWidgets += widgetList[index].duplicateOf}
+        if(instance.widgetList[index].duplicateOf == -1){allIdenticalWidgets += index;}
+        if(instance.widgetList[index].duplicateOf != -1){allIdenticalWidgets += instance.widgetList[index].duplicateOf}
     
         let currentWidget = 'widgetID_' + index;
     
@@ -284,13 +299,13 @@ class WidgetsOnGrid{
                 div[2] = document.createElement('div');
                 div[2] = ManageDiv.passed.css.addCode(div[2], 'font-weight: 700', 'widgetsStyle');
                 div[2] = ManageDiv.passed.css.addCode(div[2], 'text-align: center', 'widgetsStyle');
-                div[2] = ManageDiv.passed.css.addCode(div[2], 'line-height: ' + gridSegmentHeight + 'px', 'widgetsStyle');
+                div[2] = ManageDiv.passed.css.addCode(div[2], 'line-height: ' + instance.gridSegmentHeight + instance.sizeUnit, 'widgetsStyle');
                 div[2].innerText = "50°C";
-                div[2].classList.add(ManageGrid.create.css.sizeClass(1, 1, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap, targetCssID));
+                div[2].classList.add(ManageGrid.create.css.sizeClass(1, 1, instance.gridSegmentWidth, instance.gridSegmentHeight, instance.gridSegmentLeftGap, instance.gridSegmentTopGap, instance.sizeUnit, instance.targetCssID));
     
                 div[1] = document.createElement('img');
                 div[1].src = "./extruderIcon.svg";
-                div[1].classList.add(ManageGrid.create.css.sizeClass(1, 1, gridSegmentWidth, gridSegmentHeight, gridSegmentLeftGap, gridSegmentTopGap,targetCssID));
+                div[1].classList.add(ManageGrid.create.css.sizeClass(1, 1, instance.gridSegmentWidth, instance.gridSegmentHeight, instance.gridSegmentLeftGap, instance.gridSegmentTopGap, instance.sizeUnit, instance.targetCssID));
     
                 div[0] = document.createElement('div');
                 div[0] = ManageDiv.passed.css.addCode(div[0], 'background-color: white', 'widgetsStyle');
