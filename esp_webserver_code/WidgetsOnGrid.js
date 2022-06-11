@@ -13,6 +13,13 @@ class WidgetsOnGrid{
         this.gridSegmentTopGap = gridSegmentTopGap;
         this.gridSegmentLeftGap = gridSegmentLeftGap;
 
+        let child = document.createElement('div');
+        child.id = targetDivID + '_grid';
+        document.getElementById(targetDivID).appendChild(child)
+
+        let gridID = child.id;
+        this.gridID = gridID;
+
         this.targetDivID = targetDivID;
         this.sizeUnit = sizeUnit;
         
@@ -24,11 +31,14 @@ class WidgetsOnGrid{
             widgetList: [],
             targetDivID: targetDivID,
             targetCssID: targetCssID,
+            gridID: gridID,
             gridSegmentWidth: gridSegmentWidth,
             gridSegmentHeight: gridSegmentHeight,
             gridSegmentTopGap: gridSegmentTopGap,
             gridSegmentLeftGap: gridSegmentLeftGap,
             sizeUnit: sizeUnit,
+            gridWidth: undefined,
+            gridHeight: undefined,
         });
 
         let instance = WidgetsOnGrid.assignInstanceNumber(targetDivID)
@@ -50,12 +60,29 @@ class WidgetsOnGrid{
 
         let newWidgetDiv;
         newWidgetDiv = WidgetsOnGrid.createWidgetContent(gridInstance.widgetList, targetWidgetIndex);
-        newWidgetDiv = WidgetsOnGrid.appendWidgetID(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
         newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
         newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
-        WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, this.targetDivID);
+        WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, this.gridID);
 
         gridInstance.widgetList[targetWidgetIndex].WidgetData.jsSetup();
+    }
+
+    move(index, newTopLeftPosition){
+        let gridInstance = WidgetsOnGrid.gridInstances[this.instance]
+
+        let width = gridInstance.widgetList[index].Width
+        let height = gridInstance.widgetList[index].Height
+    
+        let oldPositionClassName = gridInstance.widgetList[index].gridPositionClass;
+        let newPositionClassName = ManageGrid.get.positionClass(gridInstance, newTopLeftPosition, width, height);
+    
+        if(newPositionClassName === undefined){return;}
+        if(oldPositionClassName == newPositionClassName){return;}
+    
+        removeGridPositionClass(index);
+        gridInstance.widgetList[index].gridPositionClass = newPositionClassName;
+    
+        ManageCss.byId.replace(oldPositionClassName, newPositionClassName, 'widgetID_' + index)
     }
 
 
@@ -79,7 +106,6 @@ class WidgetsOnGrid{
             ManageGrid.main.update.size(WidgetsOnGrid.gridInstances[i]);
             i++;
         }
-        console.log(WidgetsOnGrid.gridInstances)
     }
 
     static getGridPositionClass(instance, index){
@@ -140,19 +166,6 @@ class WidgetsOnGrid{
         let widgetStructure = widgetList[index].WidgetData.widgetStructure();
         if(widgetStructure === undefined){return document.createElement('div');}
         return widgetStructure;
-    }
-
-    static appendWidgetID(newWidgetDiv, widgetList, index){
-
-        newWidgetDiv.id = 'widgetID_' + index;
-    
-        if(widgetList[index].duplicateOf != -1){
-            newWidgetDiv.classList.add('widgetID_' + widgetList[index].duplicateOf);
-        }
-        if(widgetList[index].duplicateOf == -1){
-            newWidgetDiv.classList.add('widgetID_' + index)
-        }
-        return newWidgetDiv;
     }
 
     static appendWidgetSize(newWidgetDiv, widgetList, index){
@@ -252,9 +265,6 @@ class WidgetsOnGrid{
         let divHTML = '';
         let widget = {name: name, sizeLimits: 'unknown', acceptableAspectRatios: [undefined], widgetStructure, jsSetup, jsUnsetup, jsFunction, divHTML}
     
-        let allIdenticalWidgets = 'widgetID_'
-        if(instance.widgetList[index].duplicateOf == -1){allIdenticalWidgets += index;}
-        if(instance.widgetList[index].duplicateOf != -1){allIdenticalWidgets += instance.widgetList[index].duplicateOf}
     
         let currentWidget = 'widgetID_' + index;
     
@@ -274,13 +284,13 @@ class WidgetsOnGrid{
     
             widget.jsFunction = function(){
                 console.log('powerButton sz Hi');
-                if(printerPowerStatus == 1){printerPowerStatus = 0, ManageDiv.existing.css.replaceCode('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
-                if(printerPowerStatus == 0){printerPowerStatus = 1, ManageDiv.existing.css.replaceCode('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle'); return;}
+                if(printerPowerStatus == 1){printerPowerStatus = 0, ManageDiv.existing.css.replaceClass('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
+                if(printerPowerStatus == 0){printerPowerStatus = 1, ManageDiv.existing.css.replaceClass('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle'); return;}
             }
     
             widget.jsSetup = function(){
-                if(printerPowerStatus == 1){ManageDiv.existing.css.replaceCode('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle'); return;}
-                if(printerPowerStatus == 0){ManageDiv.existing.css.replaceCode('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
+                if(printerPowerStatus == 1){ManageDiv.existing.css.replaceClass('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle'); return;}
+                if(printerPowerStatus == 0){ManageDiv.existing.css.replaceClass('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
             }
     
             widget.divHTML = 'onclick="WidgetsOnGrid.runWidgetCode(' + ('"' + name + '"') + ')"'
@@ -401,5 +411,5 @@ window.WidgetsOnGrid = WidgetsOnGrid;
 let fff = new WidgetsOnGrid('mainDiv', 50, 50, 8, 8, 'px')
 //let ffg = new WidgetsOnGrid('mainDiv1', 25, 25, 4, 4, 'px')
 
-fff.create('powerButton', 2, 2, 4, 4);
+fff.create('powerButton', 2, 2, 1, 2);
 console.log(fff.widgetList)

@@ -75,29 +75,6 @@ function cursorPositionToGridPosition(x, y){
 
 export let widgetList = []
 
-export function createWidget(widget, height, width, posX, posY){
-    let index = getIndex_addToList(widget, height, width, posX, posY);//
-    checkAspectRatio(index);//
-    checkFixInputSize(index);//
-    
-
-    getGridPositionClass(index);//
-
-    let newWidgetDiv;
-    newWidgetDiv = createWidgetContent(index);//
-    newWidgetDiv = appendWidgetID(newWidgetDiv, index);//
-    newWidgetDiv = appendWidgetSize(newWidgetDiv, index);//
-    newWidgetDiv = appendElementAttributes(newWidgetDiv, index)//
-
-    placeDivOnScreen(newWidgetDiv, 'mainDiv');//
-    
-    widgetList[index].WidgetData.jsSetup();
-
-    console.log(widgetList);
-    console.log(index);
-    return 'ok';
-}
-
 
 export function removeWidget(index){
     removeWidgetDiv(index);
