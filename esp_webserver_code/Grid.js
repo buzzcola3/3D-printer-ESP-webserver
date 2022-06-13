@@ -111,6 +111,7 @@ export var ManageGrid = {
             instance.gridHeight = ManageGrid.main.get.height(instance);
             instance.gridWidth = ManageGrid.main.get.width(instance);
 
+
             let heightPx = ManageGrid.main.get.heightPx(instance)
             let widthPx = ManageGrid.main.get.widthPx(instance)
 
@@ -238,5 +239,46 @@ export var ManageGrid = {
     },
 
     get: {
+        pointerPosition: function(instance, moveData){
+
+            let gridHeightPx = ManageGrid.main.get.heightPx(instance)
+            let gridWidthPx = ManageGrid.main.get.widthPx(instance)
+
+            let gridHeight = instance.gridHeight;
+            let gridWidth = instance.gridWidth;
+
+            let gridSegmentHeight = instance.gridSegmentHeight;
+            let gridSegmentWidth = instance.gridSegmentWidth;
+
+            let gridTopGap = instance.gridSegmentTopGap;
+            let gridLeftGap = instance.gridSegmentLeftGap;
+
+            let Y = moveData.layerY;
+            Y = Y + (gridHeightPx/2)
+
+            let X = moveData.layerX
+
+            let cursorPointer = { X: -1, Y: -1}
+
+            let i = 0;
+            while(1){
+                if(i > (gridWidth)-1){i = -1; break;}
+                //if(x<50+(i*58) && x>0+(i*58)){gridPos.X = (i+1); break;}
+                if(X<gridSegmentWidth+(i*(gridSegmentWidth+gridLeftGap)) && X>0+(i*(gridSegmentWidth+gridLeftGap))){i = (i+1); break;} //lol
+                i++;
+            }
+            cursorPointer.X = i;
+
+            i = 0;
+            while(1){
+                if(i > (gridHeight)-1){i = -1; break;}
+                //if(x<50+(i*58) && x>0+(i*58)){gridPos.X = (i+1); break;}
+                if(Y<gridSegmentHeight+(i*(gridSegmentHeight+gridTopGap)) && Y>0+(i*(gridSegmentHeight+gridTopGap))){i = (i+1); break;} //lol
+                i++;
+            }
+            cursorPointer.Y = i;
+
+            if(cursorPointer.X != -1 && cursorPointer.Y != -1){instance.lastKnownPointerPosition = cursorPointer;} 
+        }
     },
 };

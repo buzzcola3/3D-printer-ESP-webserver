@@ -6,6 +6,7 @@ import {ManageGrid} from "./grid.js";
 var printerPowerStatus = 1;
 //!test
 
+
 class WidgetsOnGrid{
     constructor(targetDivID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit = 'px'){
         this.gridSegmentWidth = gridSegmentWidth;
@@ -19,6 +20,7 @@ class WidgetsOnGrid{
 
         let gridID = child.id;
         this.gridID = gridID;
+
 
         this.targetDivID = targetDivID;
         this.sizeUnit = sizeUnit;
@@ -39,12 +41,14 @@ class WidgetsOnGrid{
             sizeUnit: sizeUnit,
             gridWidth: undefined,
             gridHeight: undefined,
+            lastKnownCursorPosition: {X: 'unchecked', Y: 'unchecked'},
         });
 
         let instance = WidgetsOnGrid.assignInstanceNumber(targetDivID)
         this.instance = instance;
 
         window.onresize = WidgetsOnGrid.resizeHandler;
+        document.getElementById(gridID).addEventListener('pointermove', (data) => {ManageGrid.get.pointerPosition(WidgetsOnGrid.gridInstances[instance], data)})
 
         ManageGrid.main.create(WidgetsOnGrid.gridInstances[instance]);
     }
@@ -146,7 +150,6 @@ class WidgetsOnGrid{
             Height: height,
             Width: width,
             WidgetData: undefined,
-            //duplicateOf: getDuplicateWidgetIndex(widget),
             TopLeftPosition: {X: posX, Y: posY,},
         }
     
