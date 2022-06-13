@@ -56,33 +56,25 @@ class WidgetsOnGrid{
 
         let targetWidgetIndex = WidgetsOnGrid.getListId(widget, height, width, posX, posY, gridInstance);
         WidgetsOnGrid.checkFixInputSize(gridInstance.widgetList, targetWidgetIndex);
-        WidgetsOnGrid.getGridPositionClass(gridInstance, targetWidgetIndex);
 
         let newWidgetDiv;
         newWidgetDiv = WidgetsOnGrid.createWidgetContent(gridInstance.widgetList, targetWidgetIndex);
-        newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
+        newWidgetDiv = WidgetsOnGrid.appendWidgetID(gridInstance, newWidgetDiv, targetWidgetIndex);
+        newWidgetDiv = WidgetsOnGrid.appendGridPositionClass(newWidgetDiv, gridInstance, targetWidgetIndex);
+        //newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
         newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
         WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, this.gridID);
 
         gridInstance.widgetList[targetWidgetIndex].WidgetData.jsSetup();
     }
 
-    move(index, newTopLeftPosition){
+    move(targetWidgetIndex, newTopLeftPosition){
         let gridInstance = WidgetsOnGrid.gridInstances[this.instance]
 
-        let width = gridInstance.widgetList[index].Width
-        let height = gridInstance.widgetList[index].Height
-    
-        let oldPositionClassName = gridInstance.widgetList[index].gridPositionClass;
-        let newPositionClassName = ManageGrid.get.positionClass(gridInstance, newTopLeftPosition, width, height);
-    
-        if(newPositionClassName === undefined){return;}
-        if(oldPositionClassName == newPositionClassName){return;}
-    
-        removeGridPositionClass(index);
-        gridInstance.widgetList[index].gridPositionClass = newPositionClassName;
-    
-        ManageCss.byId.replace(oldPositionClassName, newPositionClassName, 'widgetID_' + index)
+        
+        
+
+        WidgetsOnGrid.updateGridPositionClass(gridInstance, targetWidgetIndex, newTopLeftPosition);
     }
 
 
@@ -108,13 +100,40 @@ class WidgetsOnGrid{
         }
     }
 
-    static getGridPositionClass(instance, index){
+    static appendGridPositionClass(targetElement, instance, index){
         let height = instance.widgetList[index].Height;
         let width = instance.widgetList[index].Width;
         let topLeft = instance.widgetList[index].TopLeftPosition;
+
+        let targetCssID = 'grid_' + instance.targetDivID + '-WidgetID_' + index;
     
-        let gridClassName = ManageGrid.get.positionClass(instance, topLeft, width, height);
-        instance.widgetList[index].gridPositionClass = gridClassName;
+        targetElement = ManageGrid.create.positionClass(instance, targetElement, targetCssID, width, height, topLeft);
+        return targetElement;
+    }
+
+    static updateGridPositionClass(instance, targetWidgetIndex, newTopLeftPosition){
+        let height = instance.widgetList[targetWidgetIndex].Height;
+        let width = instance.widgetList[targetWidgetIndex].Width;
+        let oldTopLeftPosition = instance.widgetList[targetWidgetIndex].TopLeftPosition;
+
+
+
+        let targetCssID = 'grid_' + instance.targetDivID + '-WidgetID_' + targetWidgetIndex;
+        let targetDivID = instance.targetDivID + '_widgetID_' + targetWidgetIndex;
+
+
+        instance.widgetList[targetWidgetIndex].TopLeftPosition = ManageGrid.update.positionClass(targetDivID, targetCssID, width, height, newTopLeftPosition, oldTopLeftPosition);
+
+        
+
+        console.log(instance)
+
+    
+        //document.getElementById(targetCssID).classList = targetElement.classList;
+    }
+
+    static removeGridPositionClass(instance, index){
+        ;
     }
 
 
@@ -126,7 +145,6 @@ class WidgetsOnGrid{
             rotated: 0,
             Height: height,
             Width: width,
-            gridPositionClass: undefined,
             WidgetData: undefined,
             //duplicateOf: getDuplicateWidgetIndex(widget),
             TopLeftPosition: {X: posX, Y: posY,},
@@ -168,12 +186,13 @@ class WidgetsOnGrid{
         return widgetStructure;
     }
 
-    static appendWidgetSize(newWidgetDiv, widgetList, index){
-        newWidgetDiv.classList.add(widgetList[index].gridPositionClass);
-        return newWidgetDiv;
+    static appendWidgetID(instance, currentDiv, index){
+        currentDiv.id = instance.targetDivID + '_widgetID_' + index;
+        return currentDiv;
     }
 
     static appendElementAttributes(currentDiv, widgetList, index){
+        console.log(currentDiv)
         let code = widgetList[index].WidgetData.divHTML;
 
         if(code.indexOf('=') == -1){return -1;}
@@ -266,7 +285,7 @@ class WidgetsOnGrid{
         let widget = {name: name, sizeLimits: 'unknown', acceptableAspectRatios: [undefined], widgetStructure, jsSetup, jsUnsetup, jsFunction, divHTML}
     
     
-        let currentWidget = 'widgetID_' + index;
+        let currentWidget = instance.targetDivID + '_widgetID_' + index;
     
         if(name == 'powerButton'){
     
@@ -412,4 +431,4 @@ let fff = new WidgetsOnGrid('mainDiv', 50, 50, 8, 8, 'px')
 //let ffg = new WidgetsOnGrid('mainDiv1', 25, 25, 4, 4, 'px')
 
 fff.create('powerButton', 2, 2, 1, 2);
-console.log(fff.widgetList)
+fff.move(0, {X:2, Y:2});

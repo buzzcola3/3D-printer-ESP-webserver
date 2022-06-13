@@ -3,7 +3,7 @@ import {ManageCss} from "./ManageCss.js";
 export var ManageDiv = {
     passed: {
         image: {
-            add: function f(originalDiv, imageFileName){
+            add: function(originalDiv, imageFileName){
                 originalDiv.outerHTML = 'hi'
                 console.log(originalDiv.outerHTML)
                 
@@ -21,11 +21,20 @@ export var ManageDiv = {
             },
         },
         css: {
-            addCode: function(element, cssCode, cssElementID){
+            addCode: function(element, cssCode, elementToAddCssTo){
                 let cssClassName = ManageDiv.internal.cssCodeToCssClassName(cssCode);
                 
-                ManageCss.byId.create( '.' + cssClassName + '{' + cssCode + ';}', cssElementID)
+                ManageCss.byId.create( '.' + cssClassName + '{' + cssCode + ';}', elementToAddCssTo)
                 element.classList.add(cssClassName);
+                return element;
+            },
+
+            removeCode: function(element, cssCode, elementToRemoveCssFrom){
+                let cssClassName = ManageDiv.internal.cssCodeToCssClassName(cssCode);
+                console.log(cssClassName);
+                
+                ManageCss.byId.remove(cssClassName, elementToRemoveCssFrom)
+                element.classList.remove(cssClassName);
                 return element;
 
             },
@@ -97,6 +106,8 @@ export var ManageDiv = {
 
             cssClassName = cssClassName.replaceAll('(', '_');
             cssClassName = cssClassName.replaceAll(')', '_');
+
+            cssClassName = cssClassName.replaceAll('%', 'prc');
 
             return cssClassName;
         },

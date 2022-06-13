@@ -24,6 +24,12 @@ export var ManageCss = {
         create: function(cssCode, cssElementID){
             if(cssCode.indexOf('.') == -1){console.warn('not a valid CSS');}
 
+            if (document.getElementById(cssElementID) === null){
+                let newEl = document.createElement('style');
+                newEl.id = cssElementID;
+                document.getElementsByTagName('head')[0].appendChild(newEl);
+            }
+
             if(document.getElementById(cssElementID).innerHTML.includes(cssCode)){return;}
             document.getElementById(cssElementID).innerHTML += cssCode;
             return;
@@ -42,7 +48,7 @@ export var ManageCss = {
     },
 
     byClass: {
-        replace: function f(oldClass, newClass, targetClasses){
+        replace: function(oldClass, newClass, targetClasses){
             let divList = document.getElementsByClassName(targetClasses);
         
             let i = 0;
@@ -60,6 +66,75 @@ export var ManageCss = {
                 if(divList[i] === undefined){break;}
             }
             return;
+        },
+    },
+}
+
+export var ManageWidget = {
+    cssCode: {
+        create: function(elementID, cssCode, cssElementID){
+            let cssClassName = ManageWidget.internal.cssCodeToCssClassName(cssCode);
+            let fullCssClass =  '.' + cssClassName + '{' + cssCode + ';}';
+
+
+            if (document.getElementById(cssElementID) === null){
+                let newEl = document.createElement('style');
+                newEl.id = cssElementID;
+                document.getElementsByTagName('head')[0].appendChild(newEl);
+            }
+
+            if(document.getElementById(cssElementID).innerHTML.includes(fullCssClass)){return;}
+            document.getElementById(cssElementID).innerHTML = document.getElementById(cssElementID).innerHTML += fullCssClass;
+
+
+            document.getElementById(elementID).classList.add(cssClassName);
+        },
+    
+        replace: function(){
+        },
+    
+        remove: function(elementID, cssCode, cssElementID){
+            let cssClassName = ManageWidget.internal.cssCodeToCssClassName(cssCode);
+            let fullCssClass =  '.' + cssClassName + '{' + cssCode + ';}';
+
+
+            if(document.getElementById(cssElementID).innerHTML.includes(fullCssClass) == false){console.log('not found')}
+            document.getElementById(cssElementID).innerHTML = document.getElementById(cssElementID).innerHTML.replace(fullCssClass, '');
+
+            document.getElementById(elementID).classList.remove(cssClassName);
+        },
+    },
+
+    elements: {
+        get: {
+            widgetDivElementID: function(){
+            },
+
+            widgetCssElementID: function(){
+            },
+        },
+    },
+
+    internal: {
+        cssCodeToCssClassName: function(cssCode){
+            let cssClassName = cssCode;
+
+            cssClassName = cssClassName.replaceAll(' ', '_');
+            cssClassName = cssClassName.replaceAll('.', '_');
+            cssClassName = cssClassName.replaceAll(',', '_');
+
+            cssClassName = cssClassName.replaceAll(':', '_');
+            cssClassName = cssClassName.replaceAll(';', '_');
+
+            cssClassName = cssClassName.replaceAll('"', '_');
+            cssClassName = cssClassName.replaceAll("'", '_');
+
+            cssClassName = cssClassName.replaceAll('(', '_');
+            cssClassName = cssClassName.replaceAll(')', '_');
+
+            cssClassName = cssClassName.replaceAll('%', 'prc');
+
+            return cssClassName;
         },
     },
 }
