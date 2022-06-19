@@ -41,7 +41,7 @@ class WidgetsOnGrid{
             sizeUnit: sizeUnit,
             gridWidth: undefined,
             gridHeight: undefined,
-            lastKnownCursorPosition: {X: 'unchecked', Y: 'unchecked'},
+            lastKnownPointerPosition: {X: 'unchecked', Y: 'unchecked'},
         });
 
         let instance = WidgetsOnGrid.assignInstanceNumber(targetDivID)
@@ -56,6 +56,7 @@ class WidgetsOnGrid{
     
 
     create(widget, height, width, posX, posY){
+
         let gridInstance = WidgetsOnGrid.gridInstances[this.instance]
 
         let targetWidgetIndex = WidgetsOnGrid.getListId(widget, height, width, posX, posY, gridInstance);
@@ -73,12 +74,38 @@ class WidgetsOnGrid{
     }
 
     move(targetWidgetIndex, newTopLeftPosition){
-        let gridInstance = WidgetsOnGrid.gridInstances[this.instance]
-
-        
-        
+        let gridInstance = WidgetsOnGrid.gridInstances[this.instance];
 
         WidgetsOnGrid.updateGridPositionClass(gridInstance, targetWidgetIndex, newTopLeftPosition);
+    }
+
+    moveRelative(targetWidgetIndex, TopLeftModifiers){
+        let gridInstance = WidgetsOnGrid.gridInstances[this.instance];
+
+        let oldPosX = gridInstance.widgetList[targetWidgetIndex].TopLeftPosition.X;
+        let oldPosY = gridInstance.widgetList[targetWidgetIndex].TopLeftPosition.Y;
+
+        let newPosX = oldPosX + TopLeftModifiers.X;
+        let newPosY = oldPosY + TopLeftModifiers.Y;
+
+        let newTopLeftPosition = {X: newPosX, Y: newPosY};
+
+        WidgetsOnGrid.updateGridPositionClass(gridInstance, targetWidgetIndex, newTopLeftPosition);
+    }
+
+    resize(targetWidgetIndex, newWidth, newHeight){
+        let gridInstance = WidgetsOnGrid.gridInstances[this.instance];
+
+        WidgetsOnGrid.updateGridSizeClass(gridInstance, targetWidgetIndex, newWidth, newHeight)
+    }
+
+    resizeRelative(targetWidgetIndex, widthModifier, heightModifier){
+        let gridInstance = WidgetsOnGrid.gridInstances[this.instance];
+
+        let newWidth = gridInstance.widgetList[targetWidgetIndex].size.width + widthModifier;
+        let newHeight = gridInstance.widgetList[targetWidgetIndex].size.height + heightModifier;
+
+        WidgetsOnGrid.updateGridSizeClass(gridInstance, targetWidgetIndex, newWidth, newHeight)
     }
 
 
@@ -105,8 +132,8 @@ class WidgetsOnGrid{
     }
 
     static appendGridPositionClass(targetElement, instance, index){
-        let height = instance.widgetList[index].Height;
-        let width = instance.widgetList[index].Width;
+        let height = instance.widgetList[index].size.height;
+        let width = instance.widgetList[index].size.width;
         let topLeft = instance.widgetList[index].TopLeftPosition;
 
         let targetCssID = 'grid_' + instance.targetDivID + '-WidgetID_' + index;
@@ -115,9 +142,9 @@ class WidgetsOnGrid{
         return targetElement;
     }
 
-    static updateGridPositionClass(instance, targetWidgetIndex, newTopLeftPosition){
-        let height = instance.widgetList[targetWidgetIndex].Height;
-        let width = instance.widgetList[targetWidgetIndex].Width;
+    static updateGridPositionClass(instance, targetWidgetIndex, newTopLeftPosition,){
+        let height = instance.widgetList[targetWidgetIndex].size.height;
+        let width = instance.widgetList[targetWidgetIndex].size.width;
         let oldTopLeftPosition = instance.widgetList[targetWidgetIndex].TopLeftPosition;
 
 
@@ -136,6 +163,26 @@ class WidgetsOnGrid{
         //document.getElementById(targetCssID).classList = targetElement.classList;
     }
 
+    static updateGridSizeClass(instance, targetWidgetIndex, newWidth, newHeight){
+
+        let targetCssID = 'grid_' + instance.targetDivID + '-WidgetID_' + targetWidgetIndex;
+        let targetDivID = instance.targetDivID + '_widgetID_' + targetWidgetIndex;
+
+        let TopLeftPosition = instance.widgetList[targetWidgetIndex].TopLeftPosition;
+
+
+        let newSize = {width: newWidth, height: newHeight};
+        let oldSize = instance.widgetList[targetWidgetIndex].size;
+
+        instance.widgetList[targetWidgetIndex].size = ManageGrid.update.sizeClass(instance, targetDivID, targetCssID, newSize, oldSize, TopLeftPosition);
+
+
+        console.log(instance)
+
+    
+        //document.getElementById(targetCssID).classList = targetElement.classList;
+    }
+
     static removeGridPositionClass(instance, index){
         ;
     }
@@ -147,8 +194,7 @@ class WidgetsOnGrid{
         let newWidget = {
             Index: undefined,
             rotated: 0,
-            Height: height,
-            Width: width,
+            size: {height: height, width: width},
             WidgetData: undefined,
             TopLeftPosition: {X: posX, Y: posY,},
         }
@@ -239,8 +285,8 @@ class WidgetsOnGrid{
         let minHeight = widgetList[index].WidgetData.sizeLimits.MinHeight;
         let maxHeight = widgetList[index].WidgetData.sizeLimits.MaxHeight;
     
-        let targetWidth = widgetList[index].Width;
-        let targetHeight = widgetList[index].Height;
+        let targetWidth = widgetList[index].size.width;
+        let targetHeight = widgetList[index].size.height;
     
         if(targetWidth < minWidth){console.warn('Widget width of ' + targetWidth + ' is too small, using: ' + minWidth); targetWidth = minWidth;}
         if(targetWidth > maxWidth){console.warn('Widget width of ' + targetWidth + ' is too large, using: ' + maxWidth); targetWidth = maxWidth;}
@@ -248,8 +294,8 @@ class WidgetsOnGrid{
         if(targetHeight < minHeight){console.warn('Widget height of ' + targetHeight + ' is too small, using: ' + minHeight); targetHeight = minHeight;}
         if(targetHeight > maxHeight){console.warn('Widget height of ' + targetHeight + ' is too large, using: ' + maxHeight); targetHeight = maxHeight;}
     
-        widgetList[index].Width = targetWidth;
-        widgetList[index].Height = targetHeight;
+        widgetList[index].size.width = targetWidth;
+        widgetList[index].size.height = targetHeight;
 
         WidgetsOnGrid.checkAspectRatio(widgetList, index);
 
@@ -268,8 +314,8 @@ class WidgetsOnGrid{
             let targetAspectRatioWidth = widgetList[index].WidgetData.acceptableAspectRatios[i].width;
             let targetAspectRatioHeight = widgetList[index].WidgetData.acceptableAspectRatios[i].height;
     
-            let targetWidth = widgetList[index].Width;
-            let targetHeight = widgetList[index].Height;
+            let targetWidth = widgetList[index].size.width;
+            let targetHeight = widgetList[index].size.height;
         
             if(targetAspectRatioWidth/targetAspectRatioHeight == targetWidth/targetHeight){return;}
             i++;
@@ -289,6 +335,9 @@ class WidgetsOnGrid{
     
     
         let currentWidget = instance.targetDivID + '_widgetID_' + index;
+
+        fetchData();
+
     
         if(name == 'powerButton'){
     
@@ -435,3 +484,14 @@ let fff = new WidgetsOnGrid('mainDiv', 50, 50, 8, 8, 'px')
 
 fff.create('powerButton', 2, 2, 1, 2);
 fff.move(0, {X:2, Y:2});
+
+function fetchData(){
+    let out;
+
+    fetch('./widgets.json')
+    .then(Response => Response.json())
+    .then(data => {out = data})
+
+    console.log(out)
+    //return data
+}

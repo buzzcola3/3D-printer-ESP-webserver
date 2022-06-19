@@ -1,0 +1,9 @@
+
+{
+    "powerButton": {
+        "jsSetup": 1,
+        "jsFunction": 1,
+        "jsUnsetup": 1,
+        "structure": "?"
+    }
+}

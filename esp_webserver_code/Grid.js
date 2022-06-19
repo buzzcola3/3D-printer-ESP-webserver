@@ -153,17 +153,6 @@ export var ManageGrid = {
             ManageDiv.passed.css.addCode(targetElement, 'grid-column-start: ' + xmin, targetCssID);
             ManageDiv.passed.css.addCode(targetElement, 'grid-column-end: ' + xmax, targetCssID);
             ManageDiv.passed.css.addCode(targetElement, 'transition: 1s', targetCssID);
-
-            //cssCode += '{\r';
-            //cssCode += 'height: ' + ( (heightPx) + (topGapPx) ) + instance.sizeUnit + ';\r';
-            //cssCode += 'width: ' + ( (widthPx) + (leftGapPx) ) + instance.sizeUnit + ';\r';
-            //cssCode += 'grid-row-start: ' + ymin + ';\r';
-            //cssCode += 'grid-row-end: ' + ymax + ';\r';
-            //cssCode += 'grid-column-start: ' + xmin + ';\r';
-            //cssCode += 'grid-column-end: ' + xmax + ';\r';
-            //cssCode += 'transition: 1s';
-            //cssCode += '}';
-        
         
             return targetElement;
         }, 
@@ -206,27 +195,84 @@ export var ManageGrid = {
             let newYmin = newTopLeftPosition.Y;
             let newYmax = newYmin + height;
 
-            
-            if(newTopLeftPosition.Y != oldTopLeftPosition.Y){
+            if(oldYmin != newYmin){
                 ManageWidget.cssCode.remove(targetDivID, 'grid-row-start: ' + oldYmin, targetCssID);
-                ManageWidget.cssCode.remove(targetDivID, 'grid-row-end: ' + oldYmax, targetCssID);
 
                 ManageWidget.cssCode.create(targetDivID, 'grid-row-start: ' + newYmin, targetCssID);
+            }
+
+            if(oldYmax != newYmax){
+                ManageWidget.cssCode.remove(targetDivID, 'grid-row-end: ' + oldYmax, targetCssID);
+
                 ManageWidget.cssCode.create(targetDivID, 'grid-row-end: ' + newYmax, targetCssID);
             }
 
-            if(newTopLeftPosition.X != oldTopLeftPosition.X){
+            if(oldXmin != newXmin){
                 ManageWidget.cssCode.remove(targetDivID, 'grid-column-start: ' + oldXmin, targetCssID);
-                ManageWidget.cssCode.remove(targetDivID, 'grid-column-end: ' + oldXmax, targetCssID);
 
                 ManageWidget.cssCode.create(targetDivID, 'grid-column-start: ' + newXmin, targetCssID);
+            }
+
+            if(oldXmax != newXmax){
+                ManageWidget.cssCode.remove(targetDivID, 'grid-column-end: ' + oldXmax, targetCssID);
+
                 ManageWidget.cssCode.create(targetDivID, 'grid-column-end: ' + newXmax, targetCssID);
             }
 
             return newTopLeftPosition;
         },
 
-        positionClassTopLeft: function(){},
+        sizeClass: function(instance, targetDivID, targetCssID, newSize, oldSize, TopLeftPosition){
+
+            console.log(oldSize);
+            let newWidth = newSize.width;
+            let newHeight = newSize.height;
+
+            let oldWidth = oldSize.width;
+            let oldHeight = oldSize.height;
+
+            let oldXmax = TopLeftPosition.X + oldWidth;
+            let oldYmax = TopLeftPosition.Y + oldHeight;
+            let newXmax = TopLeftPosition.X + newWidth;
+            let newYmax = TopLeftPosition.Y + newHeight;
+
+            let oldWidthPx = instance.gridSegmentWidth * oldWidth;
+            let oldHeightPx = instance.gridSegmentHeight * oldHeight;
+            let oldLeftGapPx = instance.gridSegmentLeftGap * (oldWidth-1);
+            let oldTopGapPx = instance.gridSegmentTopGap * (oldHeight-1);
+
+            let newWidthPx = instance.gridSegmentWidth * newWidth;
+            let newHeightPx = instance.gridSegmentHeight * newHeight;
+            let newLeftGapPx = instance.gridSegmentLeftGap * (newWidth-1);
+            let newTopGapPx = instance.gridSegmentTopGap * (newHeight-1);
+
+            if(newWidth != oldWidth){
+                ManageWidget.cssCode.remove(targetDivID, 'width: ' + (oldWidthPx + oldLeftGapPx) + instance.sizeUnit, targetCssID);
+
+                ManageWidget.cssCode.create(targetDivID, 'width: ' + (newWidthPx + newLeftGapPx) + instance.sizeUnit, targetCssID);
+            }
+
+            if(newHeight != oldHeight){
+                ManageWidget.cssCode.remove(targetDivID, 'height: ' + (oldHeightPx + oldTopGapPx) + instance.sizeUnit, targetCssID);
+
+                ManageWidget.cssCode.create(targetDivID, 'height: ' + (newHeightPx + newTopGapPx) + instance.sizeUnit, targetCssID);
+            }
+
+            if(oldYmax != newYmax){
+                ManageWidget.cssCode.remove(targetDivID, 'grid-row-end: ' + oldYmax, targetCssID);
+
+                ManageWidget.cssCode.create(targetDivID, 'grid-row-end: ' + newYmax, targetCssID);
+            }
+
+            if(oldXmax != newXmax){
+                ManageWidget.cssCode.remove(targetDivID, 'grid-column-end: ' + oldXmax, targetCssID);
+
+                ManageWidget.cssCode.create(targetDivID, 'grid-column-end: ' + newXmax, targetCssID);
+            }
+
+            return {width: newWidth, height: newHeight};
+
+        },
     },
 
     remove: {
