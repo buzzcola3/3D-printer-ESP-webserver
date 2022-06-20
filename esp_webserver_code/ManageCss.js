@@ -97,7 +97,7 @@ export var ManageWidget = {
             let cssClassName = ManageWidget.internal.cssCodeToCssClassName(cssCode);
             let fullCssClass =  '.' + cssClassName + '{' + cssCode + ';}';
 
-            console.warn(fullCssClass + '-> removing')
+            console.log(fullCssClass + '-> removing')
 
             if(document.getElementById(cssElementID).innerHTML.includes(fullCssClass) == false){console.warn(fullCssClass + '-> not found')}
             document.getElementById(cssElementID).innerHTML = document.getElementById(cssElementID).innerHTML.replace(fullCssClass, '');

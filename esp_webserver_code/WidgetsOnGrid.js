@@ -1,6 +1,9 @@
 import {ManageCss} from "./ManageCss.js";
 import {ManageDiv} from "./ManageDiv.js";
 import {ManageGrid} from "./grid.js";
+import {parseWidgetCode} from "./WidgetJsonParser.js";
+
+let testCode = new parseWidgetCode();
 
 //test
 var printerPowerStatus = 1;
@@ -56,8 +59,8 @@ class WidgetsOnGrid{
     
 
     create(widget, height, width, posX, posY){
-
-        let gridInstance = WidgetsOnGrid.gridInstances[this.instance]
+        let gridInstance = WidgetsOnGrid.gridInstances[this.instance];
+        
 
         let targetWidgetIndex = WidgetsOnGrid.getListId(widget, height, width, posX, posY, gridInstance);
         WidgetsOnGrid.checkFixInputSize(gridInstance.widgetList, targetWidgetIndex);
@@ -183,9 +186,6 @@ class WidgetsOnGrid{
         //document.getElementById(targetCssID).classList = targetElement.classList;
     }
 
-    static removeGridPositionClass(instance, index){
-        ;
-    }
 
 
     static getListId(widget, height, width, posX, posY, instance){
@@ -324,6 +324,22 @@ class WidgetsOnGrid{
         console.warn('wrong aspectRatio');
     }
 
+    static async fetchData(instance, widgetID, widgetName){
+        instance.widgetList[widgetID].busy = true;
+
+        let data = await fetch('./widgets.json')
+        let out = await data.json();
+        {
+            if(await out[widgetName] === undefined){console.error("widget not found")}
+            else{
+                instance.widgetList[widgetID].busy = undefined;
+                instance.widgetList[widgetID].WidgetDatas = out[widgetName];
+                return out[widgetName];
+            }
+        }
+    }
+    
+
     static getWidgetData(name, index, instance){
         function widgetStructure(){}
         function jsFunction(){}
@@ -336,7 +352,8 @@ class WidgetsOnGrid{
     
         let currentWidget = instance.targetDivID + '_widgetID_' + index;
 
-        fetchData();
+
+        WidgetsOnGrid.fetchData(instance, index, name);
 
     
         if(name == 'powerButton'){
@@ -484,14 +501,3 @@ let fff = new WidgetsOnGrid('mainDiv', 50, 50, 8, 8, 'px')
 
 fff.create('powerButton', 2, 2, 1, 2);
 fff.move(0, {X:2, Y:2});
-
-function fetchData(){
-    let out;
-
-    fetch('./widgets.json')
-    .then(Response => Response.json())
-    .then(data => {out = data})
-
-    console.log(out)
-    //return data
-}

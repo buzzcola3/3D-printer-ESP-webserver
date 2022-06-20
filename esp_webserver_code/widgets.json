@@ -1,9 +1,16 @@
 
 {
     "powerButton": {
-        "jsSetup": 1,
+        "name": "powerButton",
+        "sizeLimits": {"MinWidth": 1, "MaxWidth": 6, "MinHeight": 1, "MaxHeight": 6},
+        "widgetStructure": "?",
+
+        "dependentVars": {"printerPowerStatus": "printerPowerStatus"},
+        "dependentImagesURL": {"powerRed.svg": "powerRed", "powerGreen.svg": "powerGreen"},
+        "jsSetup": "(printerPowerStatus)$-->$(1)$-->$(powerRed)$replaceImage/$(powerGreen), (printerPowerStatus)$-->$(0) (powerGreen)$replaceImage/$(powerRed)",
         "jsFunction": 1,
         "jsUnsetup": 1,
-        "structure": "?"
+        "divHTML": {"att":"onclick=", "code":"WidgetsOnGrid.runWidgetCode(($/$name$/$))"}
+
     }
 }
