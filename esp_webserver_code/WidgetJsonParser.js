@@ -1,35 +1,101 @@
 
 export class parseWidgetCode{
-    constructor(rawString, dependentVars, dependentImagesURL){
-        let rawInstructions = parseWidgetCode.splitRawToRawInstructions(rawString);
-        console.log(rawInstructions);
+    constructor(widgetRawJson){
+
+        let widgetName = widgetRawJson.name;
+        let widgetStructure = widgetRawJson.widgetStructure;
+        let dependentVars = widgetRawJson.dependentVars;
+        let shortenedValues = widgetRawJson.shortenedValues;
+
+        let jsSetup = widgetRawJson.jsSetup;
+        let jsFunction = widgetRawJson.jsFunction;
+        let jsUnsetup = widgetRawJson.jsUnsetup;
+
+        jsSetup = parseWidgetCode.replaceFunctions(jsSetup); //done
+        jsSetup = parseWidgetCode.replaceShorts(jsSetup, shortenedValues) //done
+        console.log(jsSetup);
+        
     }
 
-    static splitRawToRawInstructions(rawCode = "(printerPowerStatus)$==$(1)$-->$(powerRed)$replaceBackgroundImage/$(powerGreen), (printerPowerStatus)$==$(0) (powerGreen)$replaceBackgroundImage/$(powerRed)"){ //"(printerPowerStatus)$-->$(1)$-->$(powerRed)$replaceImage/$(powerGreen), (printerPowerStatus)$-->$(0) (powerGreen)$replaceImage/$(powerRed)"
-        let instructionArray = [];
+    static replaceFunctions(rawString){
+
+        if(rawString.includes('$/$replaceBackgroundImage$/$')){
+            let toBeReplaced = '$/$replaceBackgroundImage$/$'
+
+            let startOfVar = rawString.indexOf(toBeReplaced)+1;
+            startOfVar = startOfVar + toBeReplaced.length;
+
+            rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
+            this.currentFunctionVars.push('widgetsStyle');
+
+            rawString = rawString.replace(toBeReplaced, 'ManageDiv.existing.css.replaceClass' + '(' + this.curFuncVarsToString() + ')');
+            this.currentFunctionVars = undefined;
+        }
+
+        console.error('loop it to get replace all, not just first'); //todo
+        if(rawString.includes('$/$')){console.warn('unknown function')}
+        return rawString;
+    }
+
+    static currentFunctionVars = [];
+
+    static getShortFunctionVars(rawString, startOfVar){
+        let out = [];
+        let endOfVar = startOfVar-1;
+        let bracketTracker = 0;
+        while(1){
+            if(rawString.charAt(endOfVar) == '('){bracketTracker++;}
+            if(rawString.charAt(endOfVar) == ')'){bracketTracker--;}
+            
+            if(bracketTracker == 0){break;}
+            endOfVar++;
+        }
+
+        let varString = rawString.slice(startOfVar, endOfVar);
+        rawString = rawString.replace(rawString.slice(startOfVar-1, endOfVar+1), '');
 
         while(1){
-            if(rawCode.indexOf(',') == -1){instructionArray.push(rawCode); break;}
-            let end = rawCode.indexOf(',')
-            
-            instructionArray.push(rawCode.slice(0, end))
-            rawCode = rawCode.slice(end+1);
+            let end = varString.indexOf(',');
+            if(end == -1){ out.push(varString); break;}
+
+            out.push(varString.slice(0, end));
+
+            varString = varString.slice(end+1);
         }
-        return instructionArray; //["(printerPowerStatus)$-->$(1)$-->$(powerRed)$replaceImage/$(powerGreen)"], ["(printerPowerStatus)$-->$(0) (powerGreen)$replaceImage/$(powerRed)"]
+        this.currentFunctionVars = out;
+        return rawString;
     }
 
-    static rawInstructionToCodeInstruction(){ //"(printerPowerStatus)$==$(1)$-->$(powerRed)$replaceBackgroundImage/$(powerGreen)"
-        return; //"if((printerPowerStatus)==(1)){ManageDiv.existing.css.replaceClass('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle')}"
+    static curFuncVarsToString(){
+        let curFuncVars = this.currentFunctionVars;
+        let varString = '';
+
+        let i = 0;
+        while(1){
+            if(curFuncVars[i] === undefined){varString = varString.slice(0, varString.length-2); break;}
+
+            varString = varString + curFuncVars[i] + ', '
+            i++;
+        }
+        return varString;
     }
 
-    static instructionFunctionTranslator(instructionSnippet){ //"(printerPowerStatus)$-->$(1)"
-        // (par1)$==$(par2)
-        return; //if((par1) == (par2))
+    static replaceShorts(rawString, shortenedValues){
+        console.log(shortenedValues[0]);
+        
+        let i = 0;
+        while(1){
+            if(shortenedValues[i] === undefined){break;}
+            let short = '$' + shortenedValues[i].short;
+            let full = shortenedValues[i].full;
+
+            rawString = rawString.replace(short, full);
+            if(rawString.includes(short)){i--;}
+
+            i++;
+        }
+        return rawString;
     }
 
-    static combineCodeToFunction(){
-        let f = function(){;}
-        return f();
-    }
 
 }

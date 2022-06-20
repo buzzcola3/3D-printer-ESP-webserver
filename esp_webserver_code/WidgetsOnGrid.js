@@ -3,7 +3,6 @@ import {ManageDiv} from "./ManageDiv.js";
 import {ManageGrid} from "./grid.js";
 import {parseWidgetCode} from "./WidgetJsonParser.js";
 
-let testCode = new parseWidgetCode();
 
 //test
 var printerPowerStatus = 1;
@@ -334,6 +333,7 @@ class WidgetsOnGrid{
             else{
                 instance.widgetList[widgetID].busy = undefined;
                 instance.widgetList[widgetID].WidgetDatas = out[widgetName];
+                let testCode = new parseWidgetCode(out[widgetName]);
                 return out[widgetName];
             }
         }
