@@ -209,7 +209,7 @@ class WidgetsOnGrid{
         }
 
         instance.widgetList[id].WidgetData = WidgetsOnGrid.getWidgetData(widget, id, instance);
-        WidgetsOnGrid.widgetCode.push({widget: widget, code: instance.widgetList[id].WidgetData.jsFunction});
+        
 
         console.log(WidgetsOnGrid.widgetCode)
         return id;
@@ -332,8 +332,14 @@ class WidgetsOnGrid{
             if(await out[widgetName] === undefined){console.error("widget not found")}
             else{
                 instance.widgetList[widgetID].busy = undefined;
-                instance.widgetList[widgetID].WidgetDatas = out[widgetName];
                 let testCode = new parseWidgetCode(out[widgetName]);
+                testCode = testCode.get()
+                instance.widgetList[widgetID].WidgetData.jsSetup = testCode.jsSetup;
+                instance.widgetList[widgetID].WidgetData.jsFunction = testCode.jsFunction;
+                instance.widgetList[widgetID].WidgetData.jsUnsetup = testCode.jsUnsetup;
+
+                WidgetsOnGrid.widgetCode.push({widget: widgetName, code: instance.widgetList[widgetID].WidgetData.jsFunction});
+
                 return out[widgetName];
             }
         }
@@ -370,16 +376,16 @@ class WidgetsOnGrid{
                 return div[0];
             }
     
-            widget.jsFunction = function(){
-                console.log('powerButton sz Hi');
-                if(printerPowerStatus == 1){printerPowerStatus = 0, ManageDiv.existing.css.replaceClass('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
-                if(printerPowerStatus == 0){printerPowerStatus = 1, ManageDiv.existing.css.replaceClass('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle'); return;}
-            }
-    
-            widget.jsSetup = function(){
-                if(printerPowerStatus == 1){ManageDiv.existing.css.replaceClass('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle'); return;}
-                if(printerPowerStatus == 0){ManageDiv.existing.css.replaceClass('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
-            }
+            //widget.jsFunction = function(){
+            //    console.log('powerButton sz Hi');
+            //    if(printerPowerStatus == 1){printerPowerStatus = 0, ManageDiv.existing.css.replaceClass('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
+            //    if(printerPowerStatus == 0){printerPowerStatus = 1, ManageDiv.existing.css.replaceClass('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle'); return;}
+            //}
+    //
+            //widget.jsSetup = function(){
+            //    if(printerPowerStatus == 1){ManageDiv.existing.css.replaceClass('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle'); return;}
+            //    if(printerPowerStatus == 0){ManageDiv.existing.css.replaceClass('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
+            //}
     
             widget.divHTML = 'onclick="WidgetsOnGrid.runWidgetCode(' + ('"' + name + '"') + ')"'
     
@@ -495,6 +501,8 @@ class WidgetsOnGrid{
     }
 }
 window.WidgetsOnGrid = WidgetsOnGrid;
+window.ManageDiv = ManageDiv;
+window.printerPowerStatus = printerPowerStatus;
 
 let fff = new WidgetsOnGrid('mainDiv', 50, 50, 8, 8, 'px')
 //let ffg = new WidgetsOnGrid('mainDiv1', 25, 25, 4, 4, 'px')

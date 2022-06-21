@@ -1,4 +1,3 @@
-
 export class parseWidgetCode{
     constructor(widgetRawJson){
 
@@ -13,26 +12,43 @@ export class parseWidgetCode{
 
         jsSetup = parseWidgetCode.replaceFunctions(jsSetup); //done
         jsSetup = parseWidgetCode.replaceShorts(jsSetup, shortenedValues) //done
-        console.log(jsSetup);
-        
+        jsSetup = new Function('', jsSetup);
+        this.jsSetup = jsSetup;
+
+        jsFunction = parseWidgetCode.replaceFunctions(jsFunction); //done
+        jsFunction = parseWidgetCode.replaceShorts(jsFunction, shortenedValues) //done
+        jsFunction = new Function('', jsFunction);
+        this.jsFunction = jsFunction;
+
+        jsUnsetup = parseWidgetCode.replaceFunctions(jsUnsetup); //done
+        jsUnsetup = parseWidgetCode.replaceShorts(jsUnsetup, shortenedValues) //done
+        jsUnsetup = new Function('', jsUnsetup);
+        this.jsUnsetup = jsUnsetup;
+
+    }
+
+    get(){
+        let jsSetup = this.jsSetup;
+        let jsFunction = this.jsFunction;
+        let jsUnsetup = this.jsUnsetup;
+        return{jsSetup, jsFunction, jsUnsetup};
     }
 
     static replaceFunctions(rawString){
 
-        if(rawString.includes('$/$replaceBackgroundImage$/$')){
+        while(rawString.includes('$/$replaceBackgroundImage$/$')){
             let toBeReplaced = '$/$replaceBackgroundImage$/$'
 
             let startOfVar = rawString.indexOf(toBeReplaced)+1;
             startOfVar = startOfVar + toBeReplaced.length;
 
             rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
-            this.currentFunctionVars.push('widgetsStyle');
+            this.currentFunctionVars.push('"widgetsStyle"');
 
             rawString = rawString.replace(toBeReplaced, 'ManageDiv.existing.css.replaceClass' + '(' + this.curFuncVarsToString() + ')');
             this.currentFunctionVars = undefined;
         }
 
-        console.error('loop it to get replace all, not just first'); //todo
         if(rawString.includes('$/$')){console.warn('unknown function')}
         return rawString;
     }

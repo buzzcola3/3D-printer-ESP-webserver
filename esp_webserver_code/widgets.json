@@ -7,9 +7,9 @@
 
         "dependentVars": {"printerPowerStatus": "printerPowerStatus"},
         "shortenedValues": [{"full": "'powerRed.svg'", "short": "powerRed"}, {"full": "'powerGreen.svg'", "short": "powerGreen"}],
-        "jsSetup": "function(){if(printerPowerStatus == 1){$/$replaceBackgroundImage$/$($powerRed, $powerGreen); break;} if(printerPowerStatus == 0){$/$replaceBackgroundImage$/$($powerGreen, $powerRed); break;}}",
-        "jsFunction": 1,
-        "jsUnsetup": 1,
+        "jsSetup": "if(printerPowerStatus == 1){$/$replaceBackgroundImage$/$($powerRed, $powerGreen); return;} if(printerPowerStatus == 0){$/$replaceBackgroundImage$/$($powerGreen, $powerRed); return;}",
+        "jsFunction": "console.log('powerButton sz Hi'); if(printerPowerStatus == 1){printerPowerStatus = 0, $/$replaceBackgroundImage$/$($powerGreen, $powerRed); return;} if(printerPowerStatus == 0){printerPowerStatus = 1, $/$replaceBackgroundImage$/$($powerRed, $powerGreen); return;}",
+        "jsUnsetup": "",
         "divHTML": {"att":"onclick=", "code":"$/$runCode$/$(($/$name$/$))"}
 
     }
