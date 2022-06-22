@@ -1,14 +1,20 @@
 export class parseWidgetCode{
     constructor(widgetRawJson){
 
-        let widgetName = widgetRawJson.name;
-        let widgetStructure = widgetRawJson.widgetStructure;
-        let dependentVars = widgetRawJson.dependentVars;
-        let shortenedValues = widgetRawJson.shortenedValues;
+
+        
+
+
+        let dependentVars = widgetRawJson.dependentVars; //
+        let shortenedValues = widgetRawJson.shortenedValues; //
+        let widgetName = widgetRawJson.name; //
 
         let jsSetup = widgetRawJson.jsSetup;
         let jsFunction = widgetRawJson.jsFunction;
         let jsUnsetup = widgetRawJson.jsUnsetup;
+        let widgetStructure = widgetRawJson.widgetStructure;
+
+
 
         jsSetup = parseWidgetCode.replaceFunctions(jsSetup); //done
         jsSetup = parseWidgetCode.replaceShorts(jsSetup, shortenedValues) //done
@@ -26,13 +32,23 @@ export class parseWidgetCode{
         jsUnsetup = new Function('', jsUnsetup);
         this.jsUnsetup = jsUnsetup;
 
+        widgetStructure = parseWidgetCode.replaceShorts(widgetStructure, shortenedValues); //done
+        console.log(widgetStructure);
+
+        widgetStructure = new Function('', widgetStructure);
+        this.widgetStructure = widgetStructure;
+
     }
 
     get(){
+        
+
         let jsSetup = this.jsSetup;
         let jsFunction = this.jsFunction;
         let jsUnsetup = this.jsUnsetup;
-        return{jsSetup, jsFunction, jsUnsetup};
+        let widgetStructure = this.widgetStructure;
+
+        return{jsSetup, jsFunction, jsUnsetup, widgetStructure};
     }
 
     static replaceFunctions(rawString){

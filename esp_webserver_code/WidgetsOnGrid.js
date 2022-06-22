@@ -4,12 +4,8 @@ import {ManageGrid} from "./grid.js";
 import {parseWidgetCode} from "./WidgetJsonParser.js";
 
 
-//test
-var printerPowerStatus = 1;
-//!test
 
-
-class WidgetsOnGrid{
+export class WidgetsOnGrid{
     constructor(targetDivID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit = 'px'){
         this.gridSegmentWidth = gridSegmentWidth;
         this.gridSegmentHeight = gridSegmentHeight;
@@ -62,32 +58,24 @@ class WidgetsOnGrid{
         
 
         let targetWidgetIndex = WidgetsOnGrid.getListId(widget, height, width, posX, posY, gridInstance);
-        WidgetsOnGrid.checkFixInputSize(gridInstance.widgetList, targetWidgetIndex);
 
-        let newWidgetDiv;
-        newWidgetDiv = WidgetsOnGrid.createWidgetContent(gridInstance.widgetList, targetWidgetIndex);
-        newWidgetDiv = WidgetsOnGrid.appendWidgetID(gridInstance, newWidgetDiv, targetWidgetIndex);
-        newWidgetDiv = WidgetsOnGrid.appendGridPositionClass(newWidgetDiv, gridInstance, targetWidgetIndex);
-        //newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
-        newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
-        WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, this.gridID);
+        //console.log(this.gridID);
+        function waitForJson(){
+            WidgetsOnGrid.checkFixInputSize(gridInstance.widgetList, targetWidgetIndex);
+            
+            let newWidgetDiv;
+            newWidgetDiv = WidgetsOnGrid.createWidgetContent(gridInstance.widgetList, targetWidgetIndex);
+            newWidgetDiv = WidgetsOnGrid.appendWidgetID(gridInstance, newWidgetDiv, targetWidgetIndex);
+            newWidgetDiv = WidgetsOnGrid.appendGridPositionClass(newWidgetDiv, gridInstance, targetWidgetIndex);
+            //newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
+            newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
+            WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, gridInstance.gridID);
 
-
-        function codeSetup(count = 0){
-            //let busy = gridInstance.widgetList[targetWidgetIndex].busy;
-            if(count > 100){console.warn('unable to setup widget'); return;}
-            count++;
-
-            if(gridInstance.widgetList[targetWidgetIndex].busy){
-                console.log(gridInstance.widgetList[targetWidgetIndex].busy);
-
-                setTimeout(codeSetup, 100);
-            }
-            else{
-                gridInstance.widgetList[targetWidgetIndex].WidgetData.jsSetup();
-            }
+            gridInstance.widgetList[targetWidgetIndex].WidgetData.jsSetup();
         }
-        codeSetup();
+
+        WidgetsOnGrid.waitForJsonWidget(gridInstance, targetWidgetIndex, waitForJson);
+
     }
 
     move(targetWidgetIndex, newTopLeftPosition){
@@ -352,6 +340,7 @@ class WidgetsOnGrid{
                 instance.widgetList[widgetID].WidgetData.jsSetup = testCode.jsSetup;
                 instance.widgetList[widgetID].WidgetData.jsFunction = testCode.jsFunction;
                 instance.widgetList[widgetID].WidgetData.jsUnsetup = testCode.jsUnsetup;
+                instance.widgetList[widgetID].WidgetData.widgetStructure = testCode.widgetStructure;
 
                 WidgetsOnGrid.widgetCode.push({widget: widgetName, code: instance.widgetList[widgetID].WidgetData.jsFunction});
 
@@ -360,6 +349,21 @@ class WidgetsOnGrid{
         }
     }
     
+    static waitForJsonWidget(gridInstance, targetWidgetIndex, targetFunction, retries = 50){ //todo move to separete function
+            if(retries <= 0){console.warn('unable to setup widget'); return;}
+            retries--;
+
+            console.log(gridInstance);
+
+            if(gridInstance.widgetList[targetWidgetIndex].busy){
+                console.log(gridInstance.widgetList[targetWidgetIndex].busy);
+
+                setTimeout(function(){WidgetsOnGrid.waitForJsonWidget(gridInstance, targetWidgetIndex, targetFunction, retries);}, 10);
+            }
+            else{
+                targetFunction();
+            }
+    }
 
     static getWidgetData(name, index, instance){
         function widgetStructure(){}
@@ -382,25 +386,15 @@ class WidgetsOnGrid{
             widget.sizeLimits = {MinWidth: 1, MaxWidth: 6, MinHeight: 1, MaxHeight: 6};
             widget.acceptableAspectRatios = [{width: 1, height: 1}];
     
-            widget.widgetStructure = function(){
-                let div = [];
+          // widget.widgetStructure = function(){
+          //     let div = [];
     
-                div[0] = document.createElement('div')
-                div[0] = ManageDiv.passed.css.addCode(div[0], 'background-image: url("powerRed.svg")', 'widgetsStyle');
-                div[0] = ManageDiv.passed.css.addCode(div[0], 'transition: 1s', 'widgetsStyle');
-                return div[0];
-            }
+          //     div[0] = document.createElement('div');
+          //     div[0] = ManageDiv.passed.css.addCode(div[0], 'background-image: url('powerRed.svg')', 'widgetsStyle');
+          //     div[0] = ManageDiv.passed.css.addCode(div[0], 'transition: 1s', 'widgetsStyle');
+          //     return div[0];
+          // }
     
-            //widget.jsFunction = function(){
-            //    console.log('powerButton sz Hi');
-            //    if(printerPowerStatus == 1){printerPowerStatus = 0, ManageDiv.existing.css.replaceClass('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
-            //    if(printerPowerStatus == 0){printerPowerStatus = 1, ManageDiv.existing.css.replaceClass('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle'); return;}
-            //}
-    //
-            //widget.jsSetup = function(){
-            //    if(printerPowerStatus == 1){ManageDiv.existing.css.replaceClass('background-image: url("powerRed.svg")', 'background-image: url("powerGreen.svg")', 'widgetsStyle'); return;}
-            //    if(printerPowerStatus == 0){ManageDiv.existing.css.replaceClass('background-image: url("powerGreen.svg")', 'background-image: url("powerRed.svg")', 'widgetsStyle'); return;}
-            //}
     
             widget.divHTML = 'onclick="WidgetsOnGrid.runWidgetCode(' + ('"' + name + '"') + ')"'
     
@@ -517,10 +511,3 @@ class WidgetsOnGrid{
 }
 window.WidgetsOnGrid = WidgetsOnGrid;
 window.ManageDiv = ManageDiv;
-window.printerPowerStatus = printerPowerStatus;
-
-let fff = new WidgetsOnGrid('mainDiv', 50, 50, 8, 8, 'px')
-//let ffg = new WidgetsOnGrid('mainDiv1', 25, 25, 4, 4, 'px')
-
-fff.create('powerButton', 2, 2, 1, 2);
-fff.move(0, {X:2, Y:2});

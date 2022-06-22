@@ -3,7 +3,7 @@
     "powerButton": {
         "name": "powerButton",
         "sizeLimits": {"MinWidth": 1, "MaxWidth": 6, "MinHeight": 1, "MaxHeight": 6},
-        "widgetStructure": "?",
+        "widgetStructure": "let div = []; div[0] = document.createElement('div'); div[0] = ManageDiv.passed.css.addCode(div[0], 'background-image: url(\"powerRed.svg\")', 'widgetsStyle'); div[0] = ManageDiv.passed.css.addCode(div[0], 'transition: 1s', 'widgetsStyle'); return div[0];",
 
         "dependentVars": {"printerPowerStatus": "printerPowerStatus"},
         "shortenedValues": [{"full": "'powerRed.svg'", "short": "powerRed"}, {"full": "'powerGreen.svg'", "short": "powerGreen"}],
