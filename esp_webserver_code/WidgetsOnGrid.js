@@ -62,7 +62,7 @@ export class WidgetsOnGrid{
         //console.log(this.gridID);
         function waitForJson(){
             WidgetsOnGrid.checkFixInputSize(gridInstance.widgetList, targetWidgetIndex);
-            
+
             let newWidgetDiv;
             newWidgetDiv = WidgetsOnGrid.createWidgetContent(gridInstance.widgetList, targetWidgetIndex);
             newWidgetDiv = WidgetsOnGrid.appendWidgetID(gridInstance, newWidgetDiv, targetWidgetIndex);
@@ -246,6 +246,7 @@ export class WidgetsOnGrid{
         console.log(currentDiv)
         let code = widgetList[index].WidgetData.divHTML;
 
+        console.log(code)
         if(code.indexOf('=') == -1){return -1;}
 
         let attName = code.slice(0, code.indexOf('='))
@@ -267,6 +268,7 @@ export class WidgetsOnGrid{
                     }
                 }
                 if(code.charAt(i) == '"'){endChar = i; currentDiv.setAttribute(attName, code.slice(0+1,i));}
+                console.log(code.slice(0+1,i))
                 i++;
             }
             
@@ -337,10 +339,12 @@ export class WidgetsOnGrid{
                 instance.widgetList[widgetID].busy = false;
                 let testCode = new parseWidgetCode(out[widgetName]);
                 testCode = testCode.get();
+                instance.widgetList[widgetID].WidgetData.divHTML = testCode.divHTML;
                 instance.widgetList[widgetID].WidgetData.jsSetup = testCode.jsSetup;
                 instance.widgetList[widgetID].WidgetData.jsFunction = testCode.jsFunction;
                 instance.widgetList[widgetID].WidgetData.jsUnsetup = testCode.jsUnsetup;
                 instance.widgetList[widgetID].WidgetData.widgetStructure = testCode.widgetStructure;
+                instance.widgetList[widgetID].WidgetData.sizeLimits = testCode.sizeLimits;
 
                 WidgetsOnGrid.widgetCode.push({widget: widgetName, code: instance.widgetList[widgetID].WidgetData.jsFunction});
 
@@ -380,26 +384,6 @@ export class WidgetsOnGrid{
 
         WidgetsOnGrid.fetchData(instance, index, name);
 
-    
-        if(name == 'powerButton'){
-    
-            widget.sizeLimits = {MinWidth: 1, MaxWidth: 6, MinHeight: 1, MaxHeight: 6};
-            widget.acceptableAspectRatios = [{width: 1, height: 1}];
-    
-          // widget.widgetStructure = function(){
-          //     let div = [];
-    
-          //     div[0] = document.createElement('div');
-          //     div[0] = ManageDiv.passed.css.addCode(div[0], 'background-image: url('powerRed.svg')', 'widgetsStyle');
-          //     div[0] = ManageDiv.passed.css.addCode(div[0], 'transition: 1s', 'widgetsStyle');
-          //     return div[0];
-          // }
-    
-    
-            widget.divHTML = 'onclick="WidgetsOnGrid.runWidgetCode(' + ('"' + name + '"') + ')"'
-    
-            return widget;
-        }
     
         if(name == 'extruderTempreature'){
     

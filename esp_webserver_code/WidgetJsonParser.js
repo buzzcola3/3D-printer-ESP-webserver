@@ -4,17 +4,24 @@ export class parseWidgetCode{
 
         
 
+        let sizeLimits = widgetRawJson.sizeLimits;
 
         let dependentVars = widgetRawJson.dependentVars; //
-        let shortenedValues = widgetRawJson.shortenedValues; //
+        let shortenedValues = widgetRawJson.shortenedValues; 
         let widgetName = widgetRawJson.name; //
 
+        let divHTML = widgetRawJson.divHTML;
         let jsSetup = widgetRawJson.jsSetup;
         let jsFunction = widgetRawJson.jsFunction;
         let jsUnsetup = widgetRawJson.jsUnsetup;
         let widgetStructure = widgetRawJson.widgetStructure;
 
 
+        this.sizeLimits = sizeLimits;
+
+        divHTML = parseWidgetCode.replaceShorts(divHTML, shortenedValues);
+        this.divHTML = divHTML;
+        console.log(this.divHTML)
 
         jsSetup = parseWidgetCode.replaceFunctions(jsSetup); //done
         jsSetup = parseWidgetCode.replaceShorts(jsSetup, shortenedValues) //done
@@ -41,14 +48,14 @@ export class parseWidgetCode{
     }
 
     get(){
-        
-
+        let divHTML = this.divHTML;
         let jsSetup = this.jsSetup;
         let jsFunction = this.jsFunction;
         let jsUnsetup = this.jsUnsetup;
         let widgetStructure = this.widgetStructure;
+        let sizeLimits = this.sizeLimits
 
-        return{jsSetup, jsFunction, jsUnsetup, widgetStructure};
+        return{divHTML, jsSetup, jsFunction, jsUnsetup, widgetStructure, sizeLimits};
     }
 
     static replaceFunctions(rawString){
