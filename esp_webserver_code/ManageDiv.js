@@ -65,6 +65,8 @@ export var ManageDiv = {
             },
 
             replaceClass: function(cssCode, newCssCode, cssElementID){
+                console.warn(cssCode)
+                console.warn(newCssCode)
                 let cssClassName = ManageDiv.internal.cssCodeToCssClassName(cssCode);
 
                 let newClassName = ManageDiv.internal.cssCodeToCssClassName(newCssCode);

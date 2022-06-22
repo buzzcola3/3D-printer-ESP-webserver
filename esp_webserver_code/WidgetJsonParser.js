@@ -12,6 +12,7 @@ export class parseWidgetCode{
 
         jsSetup = parseWidgetCode.replaceFunctions(jsSetup); //done
         jsSetup = parseWidgetCode.replaceShorts(jsSetup, shortenedValues) //done
+        console.log(jsSetup)
         jsSetup = new Function('', jsSetup);
         this.jsSetup = jsSetup;
 
@@ -43,6 +44,7 @@ export class parseWidgetCode{
             startOfVar = startOfVar + toBeReplaced.length;
 
             rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
+            this.currentFunctionVars = parseWidgetCode.varsPrepareForBgImageReplace(this.currentFunctionVars);
             this.currentFunctionVars.push('"widgetsStyle"');
 
             rawString = rawString.replace(toBeReplaced, 'ManageDiv.existing.css.replaceClass' + '(' + this.curFuncVarsToString() + ')');
@@ -51,6 +53,12 @@ export class parseWidgetCode{
 
         if(rawString.includes('$/$')){console.warn('unknown function')}
         return rawString;
+    }
+
+    static varsPrepareForBgImageReplace(vars){
+        vars[0] = '"background-image: url('+ vars[0] +')"';
+        vars[1] = '"background-image: url('+ vars[1] +')"';
+        return vars;
     }
 
     static currentFunctionVars = [];
@@ -77,6 +85,10 @@ export class parseWidgetCode{
             out.push(varString.slice(0, end));
 
             varString = varString.slice(end+1);
+
+            while(varString.charAt(0) == ' '){
+                varString = varString.substring(1);
+            }
         }
         this.currentFunctionVars = out;
         return rawString;
@@ -95,6 +107,7 @@ export class parseWidgetCode{
         }
         return varString;
     }
+
 
     static replaceShorts(rawString, shortenedValues){
         console.log(shortenedValues[0]);

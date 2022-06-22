@@ -72,7 +72,22 @@ class WidgetsOnGrid{
         newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
         WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, this.gridID);
 
-        gridInstance.widgetList[targetWidgetIndex].WidgetData.jsSetup();
+
+        function codeSetup(count = 0){
+            //let busy = gridInstance.widgetList[targetWidgetIndex].busy;
+            if(count > 100){console.warn('unable to setup widget'); return;}
+            count++;
+
+            if(gridInstance.widgetList[targetWidgetIndex].busy){
+                console.log(gridInstance.widgetList[targetWidgetIndex].busy);
+
+                setTimeout(codeSetup, 100);
+            }
+            else{
+                gridInstance.widgetList[targetWidgetIndex].WidgetData.jsSetup();
+            }
+        }
+        codeSetup();
     }
 
     move(targetWidgetIndex, newTopLeftPosition){
@@ -331,9 +346,9 @@ class WidgetsOnGrid{
         {
             if(await out[widgetName] === undefined){console.error("widget not found")}
             else{
-                instance.widgetList[widgetID].busy = undefined;
+                instance.widgetList[widgetID].busy = false;
                 let testCode = new parseWidgetCode(out[widgetName]);
-                testCode = testCode.get()
+                testCode = testCode.get();
                 instance.widgetList[widgetID].WidgetData.jsSetup = testCode.jsSetup;
                 instance.widgetList[widgetID].WidgetData.jsFunction = testCode.jsFunction;
                 instance.widgetList[widgetID].WidgetData.jsUnsetup = testCode.jsUnsetup;
