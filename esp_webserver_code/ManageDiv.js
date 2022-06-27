@@ -23,6 +23,8 @@ export var ManageDiv = {
         css: {
             addCode: function(element, cssCode, elementToAddCssTo){
                 let cssClassName = ManageDiv.internal.cssCodeToCssClassName(cssCode);
+
+                console.log(element)
                 
                 ManageCss.byId.create( '.' + cssClassName + '{' + cssCode + ';}', elementToAddCssTo)
                 element.classList.add(cssClassName);

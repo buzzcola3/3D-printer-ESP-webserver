@@ -3,7 +3,7 @@
     "powerButton": {
         "name": "powerButton",
         "sizeLimits": {"MinWidth": 1, "MaxWidth": 6, "MinHeight": 1, "MaxHeight": 6},
-        "widgetStructure": "let div = []; div[0] = document.createElement('div'); div[0] = ManageDiv.passed.css.addCode(div[0], 'background-image: url(\"powerRed.svg\")', 'widgetsStyle'); div[0] = ManageDiv.passed.css.addCode(div[0], 'transition: 1s', 'widgetsStyle'); return div[0];",
+        "widgetStructure": "let div = []; div[0] = document.createElement('div'); div[0] = $/$addCssCode$/$(div[0], 'background-image: url(\"powerRed.svg\")'); div[0] = $/$addCssCode$/$(div[0], 'transition: 1s'); return div[0];",
 
         "dependentVars": {"printerPowerStatus": "printerPowerStatus"},
         "shortenedValues": [{"full": "'powerRed.svg'", "short": "powerRed"}, {"full": "'powerGreen.svg'", "short": "powerGreen"}],
@@ -17,7 +17,7 @@
     "extruderTempreature": {
         "name": "extruderTempreature",
         "sizeLimits": {"MinWidth": 2, "MaxWidth": 2, "MinHeight": 1, "MaxHeight": 1},
-        "widgetStructure": "let div = []; div[2] = document.createElement('div'); div[2] = ManageDiv.passed.css.addCode(div[2], 'font-weight: 700', 'widgetsStyle'); div[2] = ManageDiv.passed.css.addCode(div[2], 'text-align: center', 'widgetsStyle'); div[2] = ManageDiv.passed.css.addCode(div[2], 'line-height: 50px', 'widgetsStyle'); div[2].innerText = '50°C'; div[2].classList.add($/$addSize$/$(1, 1)); div[1] = document.createElement('img'); div[1].src = './extruderIcon.svg'; div[1].classList.add($/$addSize$/$(1, 1)); div[0] = document.createElement('div'); div[0] = ManageDiv.passed.css.addCode(div[0], 'background-color: white', 'widgetsStyle'); div[0] = ManageDiv.passed.css.addCode(div[0], 'display: flex', 'widgetsStyle'); div[0] = ManageDiv.passed.css.addCode(div[0], 'flex-wrap: wrap', 'widgetsStyle'); div[0] = ManageDiv.passed.css.addCode(div[0], 'border-radius: 10px', 'widgetsStyle'); div[0] = ManageDiv.passed.css.addCode(div[0], 'justify-content: space-between', 'widgetsStyle'); div[0].appendChild(div[1]); div[1] = undefined; div[0].appendChild(div[2]); div[2] = undefined; return div[0];",
+        "widgetStructure": "let div = []; div[2] = document.createElement('div'); div[2] = $/$addCssCode$/$(div[2], 'font-weight: 700'); div[2] = $/$addCssCode$/$(div[2], 'text-align: center'); div[2] = $/$addCssCode$/$(div[2], 'line-height: 50px'); div[2].innerText = '50°C'; div[2].classList.add($/$addSize$/$(1, 1)); div[1] = document.createElement('img'); div[1].src = './extruderIcon.svg'; div[1].classList.add($/$addSize$/$(1, 1)); div[0] = document.createElement('div'); div[0] = $/$addCssCode$/$(div[0], 'background-color: white'); div[0] = $/$addCssCode$/$(div[0], 'display: flex'); div[0] = $/$addCssCode$/$(div[0], 'flex-wrap: wrap'); div[0] = $/$addCssCode$/$(div[0], 'border-radius: 10px'); div[0] = $/$addCssCode$/$(div[0], 'justify-content: space-between'); div[0].appendChild(div[1]); div[1] = undefined; div[0].appendChild(div[2]); div[2] = undefined; return div[0];",
 
         "dependentVars": {"printerPowerStatus": "printerPowerStatus"},
         "shortenedValues": [],

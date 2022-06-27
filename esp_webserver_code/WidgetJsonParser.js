@@ -91,10 +91,20 @@ export class parseWidgetCode{
 
             rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
             this.currentFunctionVars.push("'" + gridDivID + "'");
-            console.log(this.currentFunctionVars);
-            console.log(this.curFuncVarsToString());
 
             rawString = rawString.replace(toBeReplaced, 'tools.sizeOfElement' + '(' + this.curFuncVarsToString() + ')');
+            this.currentFunctionVars = undefined;
+        }
+
+        while(rawString.includes('$/$addCssCode$/$')){
+            let toBeReplaced = '$/$addCssCode$/$'
+
+            let startOfVar = rawString.indexOf(toBeReplaced)+1;
+            startOfVar = startOfVar + toBeReplaced.length;
+
+            rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
+
+            rawString = rawString.replace(toBeReplaced, 'tools.addCssCode' + '(' + this.curFuncVarsToString() + ')');
             this.currentFunctionVars = undefined;
         }
 
