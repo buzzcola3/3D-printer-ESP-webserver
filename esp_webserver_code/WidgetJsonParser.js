@@ -1,8 +1,10 @@
 import {tools} from "./widgetFunctions.js";
 
 export class parseWidgetCode{
-    constructor(widgetRawJson){
+    constructor(widgetRawJson, gridInstance){
 
+        console.log(gridInstance);
+        let gridDivID = gridInstance.targetDivID;
 
         
 
@@ -29,24 +31,24 @@ export class parseWidgetCode{
         this.divHTML = divHTML;
         console.log(this.divHTML)
 
-        jsSetup = parseWidgetCode.replaceFunctions(jsSetup); //done
+        jsSetup = parseWidgetCode.replaceFunctions(jsSetup, gridDivID); //done
         jsSetup = parseWidgetCode.replaceShorts(jsSetup, shortenedValues) //done
         console.log(jsSetup)
         jsSetup = new Function('', jsSetup);
         this.jsSetup = jsSetup;
 
-        jsFunction = parseWidgetCode.replaceFunctions(jsFunction); //done
+        jsFunction = parseWidgetCode.replaceFunctions(jsFunction, gridDivID); //done
         jsFunction = parseWidgetCode.replaceShorts(jsFunction, shortenedValues) //done
         jsFunction = new Function('', jsFunction);
         this.jsFunction = jsFunction;
 
-        jsUnsetup = parseWidgetCode.replaceFunctions(jsUnsetup); //done
+        jsUnsetup = parseWidgetCode.replaceFunctions(jsUnsetup, gridDivID); //done
         jsUnsetup = parseWidgetCode.replaceShorts(jsUnsetup, shortenedValues) //done
         jsUnsetup = new Function('', jsUnsetup);
         this.jsUnsetup = jsUnsetup;
 
         widgetStructure = parseWidgetCode.replaceShorts(widgetStructure, shortenedValues); //done
-        widgetStructure = parseWidgetCode.replaceFunctions(widgetStructure);
+        widgetStructure = parseWidgetCode.replaceFunctions(widgetStructure, gridDivID);
         console.log(widgetStructure);
         widgetStructure = new Function('', widgetStructure);
         this.widgetStructure = widgetStructure;
@@ -66,7 +68,7 @@ export class parseWidgetCode{
         return{name, sizeLimits, divHTML, jsSetup, jsFunction, jsUnsetup, widgetStructure};
     }
 
-    static replaceFunctions(rawString){
+    static replaceFunctions(rawString, gridDivID){
 
         while(rawString.includes('$/$replaceBackgroundImage$/$')){
             let toBeReplaced = '$/$replaceBackgroundImage$/$'
@@ -88,6 +90,9 @@ export class parseWidgetCode{
             startOfVar = startOfVar + toBeReplaced.length;
 
             rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
+            this.currentFunctionVars.push("'" + gridDivID + "'");
+            console.log(this.currentFunctionVars);
+            console.log(this.curFuncVarsToString());
 
             rawString = rawString.replace(toBeReplaced, 'tools.sizeOfElement' + '(' + this.curFuncVarsToString() + ')');
             this.currentFunctionVars = undefined;

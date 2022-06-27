@@ -44,8 +44,10 @@ export class WidgetsOnGrid{
             lastKnownPointerPosition: {X: 'unchecked', Y: 'unchecked'},
         });
 
+        
         let instance = WidgetsOnGrid.assignInstanceNumber(targetDivID)
         this.instance = instance;
+        
 
         window.onresize = WidgetsOnGrid.resizeHandler;
         document.getElementById(gridID).addEventListener('pointermove', (data) => {ManageGrid.get.pointerPosition(WidgetsOnGrid.grid.instances[instance], data)})
@@ -56,7 +58,7 @@ export class WidgetsOnGrid{
     static grid = {instances: [], widgetSheet: {data: [], busy: false}};
 
     create(widget, height, width, posX, posY){
-        WidgetsOnGrid.fetchWidgetDataFromJson(widget);
+        WidgetsOnGrid.fetchWidgetDataFromJson(widget, this.instance);
         WidgetsOnGrid.createWidget(widget, height, width, posX, posY, this.instance)
     }
     static createWidget(widget, height, width, posX, posY, instance){
@@ -362,7 +364,7 @@ export class WidgetsOnGrid{
 //        console.warn('wrong aspectRatio');
 //    }
 
-    static async fetchWidgetDataFromJson(widgetName){
+    static async fetchWidgetDataFromJson(widgetName, instanceNum){
         if(WidgetsOnGrid.grid.widgetSheet.busy == true){return;};
         WidgetsOnGrid.grid.widgetSheet.busy = true;
 
@@ -372,7 +374,9 @@ export class WidgetsOnGrid{
             if(await out[widgetName] === undefined){console.error("widget not found")}
             else{
                 WidgetsOnGrid.grid.widgetSheet.busy = false;
-                let testCode = new parseWidgetCode(out[widgetName]);
+
+                let gridInstance = WidgetsOnGrid.grid.instances[instanceNum];
+                let testCode = new parseWidgetCode(out[widgetName], gridInstance);
                 testCode = testCode.get();
                 WidgetsOnGrid.grid.widgetSheet.data.push(testCode);
 
@@ -408,50 +412,6 @@ export class WidgetsOnGrid{
         let currentWidget = instance.targetDivID + '_widgetID_' + index;
 
 
-        WidgetsOnGrid.fetchData(instance, index, name);
-
-    
-        if(name == 'extruderTempreature'){
-    
-            widget.sizeLimits = {MinWidth: 2, MaxWidth: 2, MinHeight: 1, MaxHeight: 1};
-            widget.acceptableAspectRatios = [{width: 2, height: 1}];
-    
-            widget.widgetStructure = function(){
-                let div = [];
-    
-                div[2] = document.createElement('div');
-                div[2] = ManageDiv.passed.css.addCode(div[2], 'font-weight: 700', 'widgetsStyle');
-                div[2] = ManageDiv.passed.css.addCode(div[2], 'text-align: center', 'widgetsStyle');
-                div[2] = ManageDiv.passed.css.addCode(div[2], 'line-height: ' + instance.gridSegmentHeight + instance.sizeUnit, 'widgetsStyle');
-                div[2].innerText = "50°C";
-                div[2].classList.add(ManageGrid.create.css.sizeClass(1, 1, instance.gridSegmentWidth, instance.gridSegmentHeight, instance.gridSegmentLeftGap, instance.gridSegmentTopGap, instance.sizeUnit, instance.targetCssID));
-    
-                div[1] = document.createElement('img');
-                div[1].src = "./extruderIcon.svg";
-                div[1].classList.add(ManageGrid.create.css.sizeClass(1, 1, instance.gridSegmentWidth, instance.gridSegmentHeight, instance.gridSegmentLeftGap, instance.gridSegmentTopGap, instance.sizeUnit, instance.targetCssID));
-    
-                div[0] = document.createElement('div');
-                div[0] = ManageDiv.passed.css.addCode(div[0], 'background-color: white', 'widgetsStyle');
-                div[0] = ManageDiv.passed.css.addCode(div[0], 'display: flex', 'widgetsStyle');
-                div[0] = ManageDiv.passed.css.addCode(div[0], 'flex-wrap: wrap', 'widgetsStyle');
-                div[0] = ManageDiv.passed.css.addCode(div[0], 'border-radius: 10px', 'widgetsStyle')
-                div[0] = ManageDiv.passed.css.addCode(div[0], 'justify-content: space-between', 'widgetsStyle')
-                div[0].appendChild(div[1]); div[1] = undefined;
-                div[0].appendChild(div[2]); div[2] = undefined;
-    
-                return div[0];
-            }
-    
-            widget.jsSetup = function(){ManageCss.byId.replace('none', 'extruderTempreature', currentWidget);}
-    
-            widget.jsUnsetup = function(){console.log('bye');}
-    
-            widget.jsFunction = function(){console.log('still here');}
-    
-            widget.divHTML = 'onclick="widgetList[' + index + '].WidgetData.jsFunction()"';
-    
-            return widget;
-        }
     
         if(name == 'widgetMoveWidget'){
             widget.sizeLimits = {MinWidth: 1, MaxWidth: 2, MinHeight: 1, MaxHeight: 2};
