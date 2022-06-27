@@ -1,21 +1,27 @@
+import {tools} from "./widgetFunctions.js";
+
 export class parseWidgetCode{
     constructor(widgetRawJson){
 
 
         
 
-        let sizeLimits = widgetRawJson.sizeLimits;
-
         let dependentVars = widgetRawJson.dependentVars; //
         let shortenedValues = widgetRawJson.shortenedValues; 
         let widgetName = widgetRawJson.name; //
 
+        let name = widgetRawJson.name;
+        let sizeLimits = widgetRawJson.sizeLimits;
         let divHTML = widgetRawJson.divHTML;
         let jsSetup = widgetRawJson.jsSetup;
         let jsFunction = widgetRawJson.jsFunction;
         let jsUnsetup = widgetRawJson.jsUnsetup;
         let widgetStructure = widgetRawJson.widgetStructure;
 
+
+
+
+        this.name = name;
 
         this.sizeLimits = sizeLimits;
 
@@ -40,22 +46,24 @@ export class parseWidgetCode{
         this.jsUnsetup = jsUnsetup;
 
         widgetStructure = parseWidgetCode.replaceShorts(widgetStructure, shortenedValues); //done
+        widgetStructure = parseWidgetCode.replaceFunctions(widgetStructure);
         console.log(widgetStructure);
-
         widgetStructure = new Function('', widgetStructure);
         this.widgetStructure = widgetStructure;
 
     }
 
     get(){
+        let name = this.name;
+        let sizeLimits = this.sizeLimits
         let divHTML = this.divHTML;
         let jsSetup = this.jsSetup;
         let jsFunction = this.jsFunction;
         let jsUnsetup = this.jsUnsetup;
         let widgetStructure = this.widgetStructure;
-        let sizeLimits = this.sizeLimits
 
-        return{divHTML, jsSetup, jsFunction, jsUnsetup, widgetStructure, sizeLimits};
+
+        return{name, sizeLimits, divHTML, jsSetup, jsFunction, jsUnsetup, widgetStructure};
     }
 
     static replaceFunctions(rawString){
@@ -68,9 +76,20 @@ export class parseWidgetCode{
 
             rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
             this.currentFunctionVars = parseWidgetCode.varsPrepareForBgImageReplace(this.currentFunctionVars);
-            this.currentFunctionVars.push('"widgetsStyle"');
 
-            rawString = rawString.replace(toBeReplaced, 'ManageDiv.existing.css.replaceClass' + '(' + this.curFuncVarsToString() + ')');
+            rawString = rawString.replace(toBeReplaced, 'tools.modify.replaceBackgroundImage' + '(' + this.curFuncVarsToString() + ')');
+            this.currentFunctionVars = undefined;
+        }
+
+        while(rawString.includes('$/$addSize$/$')){
+            let toBeReplaced = '$/$addSize$/$'
+
+            let startOfVar = rawString.indexOf(toBeReplaced)+1;
+            startOfVar = startOfVar + toBeReplaced.length;
+
+            rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
+
+            rawString = rawString.replace(toBeReplaced, 'tools.sizeOfElement' + '(' + this.curFuncVarsToString() + ')');
             this.currentFunctionVars = undefined;
         }
 

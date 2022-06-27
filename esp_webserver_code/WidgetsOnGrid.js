@@ -26,8 +26,10 @@ export class WidgetsOnGrid{
         let targetCssID = 'gridStyle_' + targetDivID;
         this.targetCssID = targetCssID;
 
+        this.create = this.create;
 
-        WidgetsOnGrid.gridInstances.push({ // ----------------<-----------------<------- USE THIZ
+
+        WidgetsOnGrid.grid.instances.push({ // ----------------<-----------------<------- USE THIZ
             widgetList: [],
             targetDivID: targetDivID,
             targetCssID: targetCssID,
@@ -46,46 +48,55 @@ export class WidgetsOnGrid{
         this.instance = instance;
 
         window.onresize = WidgetsOnGrid.resizeHandler;
-        document.getElementById(gridID).addEventListener('pointermove', (data) => {ManageGrid.get.pointerPosition(WidgetsOnGrid.gridInstances[instance], data)})
+        document.getElementById(gridID).addEventListener('pointermove', (data) => {ManageGrid.get.pointerPosition(WidgetsOnGrid.grid.instances[instance], data)})
 
-        ManageGrid.main.create(WidgetsOnGrid.gridInstances[instance]);
+        ManageGrid.main.create(WidgetsOnGrid.grid.instances[instance]);
     }
 
-    
+    static grid = {instances: [], widgetSheet: {data: [], busy: false}};
 
     create(widget, height, width, posX, posY){
-        let gridInstance = WidgetsOnGrid.gridInstances[this.instance];
-        
-
-        let targetWidgetIndex = WidgetsOnGrid.getListId(widget, height, width, posX, posY, gridInstance);
-
-        //console.log(this.gridID);
-        function waitForJson(){
-            WidgetsOnGrid.checkFixInputSize(gridInstance.widgetList, targetWidgetIndex);
-
-            let newWidgetDiv;
-            newWidgetDiv = WidgetsOnGrid.createWidgetContent(gridInstance.widgetList, targetWidgetIndex);
-            newWidgetDiv = WidgetsOnGrid.appendWidgetID(gridInstance, newWidgetDiv, targetWidgetIndex);
-            newWidgetDiv = WidgetsOnGrid.appendGridPositionClass(newWidgetDiv, gridInstance, targetWidgetIndex);
-            //newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
-            newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, gridInstance.widgetList, targetWidgetIndex);
-            WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, gridInstance.gridID);
-
-            gridInstance.widgetList[targetWidgetIndex].WidgetData.jsSetup();
+        WidgetsOnGrid.fetchWidgetDataFromJson(widget);
+        WidgetsOnGrid.createWidget(widget, height, width, posX, posY, this.instance)
+    }
+    static createWidget(widget, height, width, posX, posY, instance){
+        if(WidgetsOnGrid.grid.widgetSheet.busy){
+            //return;
+            WidgetsOnGrid.ifBusyCallFunction(function(){WidgetsOnGrid.createWidget(widget, height, width, posX, posY, instance)});
+            return;
         }
 
-        WidgetsOnGrid.waitForJsonWidget(gridInstance, targetWidgetIndex, waitForJson);
 
+        let gridInstance = WidgetsOnGrid.grid.instances[instance];
+        let newWidgetID = WidgetsOnGrid.getListId(widget, height, width, posX, posY, gridInstance);
+
+
+        
+
+        //console.log(this.gridID);
+            WidgetsOnGrid.checkFixInputSize(gridInstance, newWidgetID);
+
+            let newWidgetDiv;
+            newWidgetDiv = WidgetsOnGrid.createWidgetContent(widget);
+            newWidgetDiv = WidgetsOnGrid.appendWidgetID(gridInstance, newWidgetDiv, newWidgetID);
+            newWidgetDiv = WidgetsOnGrid.appendGridPositionClass(newWidgetDiv, gridInstance, newWidgetID);
+            //newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, gridInstance.widgetList, newWidgetID);
+            newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, widget);
+            WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, gridInstance.gridID);
+
+            let templateSheetID = WidgetsOnGrid.findWidgetInSheet(widget);
+            this.grid.widgetSheet.data[templateSheetID].jsSetup();
+        
     }
 
     move(targetWidgetIndex, newTopLeftPosition){
-        let gridInstance = WidgetsOnGrid.gridInstances[this.instance];
+        let gridInstance = WidgetsOnGrid.grid.instances[this.instance];
 
         WidgetsOnGrid.updateGridPositionClass(gridInstance, targetWidgetIndex, newTopLeftPosition);
     }
 
     moveRelative(targetWidgetIndex, TopLeftModifiers){
-        let gridInstance = WidgetsOnGrid.gridInstances[this.instance];
+        let gridInstance = WidgetsOnGrid.grid.instances[this.instance];
 
         let oldPosX = gridInstance.widgetList[targetWidgetIndex].TopLeftPosition.X;
         let oldPosY = gridInstance.widgetList[targetWidgetIndex].TopLeftPosition.Y;
@@ -99,13 +110,13 @@ export class WidgetsOnGrid{
     }
 
     resize(targetWidgetIndex, newWidth, newHeight){
-        let gridInstance = WidgetsOnGrid.gridInstances[this.instance];
+        let gridInstance = WidgetsOnGrid.grid.instances[this.instance];
 
         WidgetsOnGrid.updateGridSizeClass(gridInstance, targetWidgetIndex, newWidth, newHeight)
     }
 
     resizeRelative(targetWidgetIndex, widthModifier, heightModifier){
-        let gridInstance = WidgetsOnGrid.gridInstances[this.instance];
+        let gridInstance = WidgetsOnGrid.grid.instances[this.instance];
 
         let newWidth = gridInstance.widgetList[targetWidgetIndex].size.width + widthModifier;
         let newHeight = gridInstance.widgetList[targetWidgetIndex].size.height + heightModifier;
@@ -114,14 +125,14 @@ export class WidgetsOnGrid{
     }
 
 
-    static gridInstances = [];
+
 
     static assignInstanceNumber(targetDivID){
         let i = 0;
         
         while(1){
-            if(WidgetsOnGrid.gridInstances[i].targetDivID === undefined){console.warn('instance could not be assigned'); return -1;}
-            if(WidgetsOnGrid.gridInstances[i].targetDivID == targetDivID){return i;}
+            if(WidgetsOnGrid.grid.instances[i].targetDivID === undefined){console.warn('instance could not be assigned'); return -1;}
+            if(WidgetsOnGrid.grid.instances[i].targetDivID == targetDivID){return i;}
             i++;
         }
         
@@ -130,8 +141,8 @@ export class WidgetsOnGrid{
     static resizeHandler(){ //mainGrid
         let i = 0;
         while(1){
-            if(WidgetsOnGrid.gridInstances[i] === undefined){break;}
-            ManageGrid.main.update.size(WidgetsOnGrid.gridInstances[i]);
+            if(WidgetsOnGrid.grid.instances[i] === undefined){break;}
+            ManageGrid.main.update.size(WidgetsOnGrid.grid.instances[i]);
             i++;
         }
     }
@@ -195,9 +206,9 @@ export class WidgetsOnGrid{
         console.log(instance)
         let newWidget = {
             Index: undefined,
+            name: widget,
             rotated: 0,
             size: {height: height, width: width},
-            WidgetData: undefined,
             TopLeftPosition: {X: posX, Y: posY,},
         }
     
@@ -211,30 +222,33 @@ export class WidgetsOnGrid{
             id++;
         }
 
-        instance.widgetList[id].WidgetData = WidgetsOnGrid.getWidgetData(widget, id, instance);
-        
-
-        console.log(WidgetsOnGrid.widgetCode)
         return id;
     }
+
 
     static widgetCode = [];
 
     static runWidgetCode(widgetName){
+        let sheetID = WidgetsOnGrid.findWidgetInSheet(widgetName);
         console.log('widgetClicked: ' + widgetName)
-        let i = 0;
-        while(1){
-            if(WidgetsOnGrid.widgetCode[i] === undefined){return;}
-            if(WidgetsOnGrid.widgetCode[i].widget == widgetName){break;}
-            i++;
-        }
-        WidgetsOnGrid.widgetCode[i].code();
+        console.log(WidgetsOnGrid.grid.widgetSheet.data[sheetID].jsFunction)
+        WidgetsOnGrid.grid.widgetSheet.data[sheetID].jsFunction();
     }
 
-    static createWidgetContent(widgetList, index){
-        let widgetStructure = widgetList[index].WidgetData.widgetStructure();
+    static createWidgetContent(widgetName){
+        let sheetID = WidgetsOnGrid.findWidgetInSheet(widgetName);
+        let widgetStructure = WidgetsOnGrid.grid.widgetSheet.data[sheetID].widgetStructure();
         if(widgetStructure === undefined){return document.createElement('div');}
         return widgetStructure;
+    }
+
+    static findWidgetInSheet(widgetName){
+        let i = 0;
+        while(1){
+            if(WidgetsOnGrid.grid.widgetSheet.data[i] === undefined){break;}
+            if(WidgetsOnGrid.grid.widgetSheet.data[i].name == widgetName){return i;}
+            i++;
+        }
     }
 
     static appendWidgetID(instance, currentDiv, index){
@@ -242,9 +256,10 @@ export class WidgetsOnGrid{
         return currentDiv;
     }
 
-    static appendElementAttributes(currentDiv, widgetList, index){
+    static appendElementAttributes(currentDiv, widgetName){
         console.log(currentDiv)
-        let code = widgetList[index].WidgetData.divHTML;
+        let sheetID = WidgetsOnGrid.findWidgetInSheet(widgetName);
+        let code = WidgetsOnGrid.grid.widgetSheet.data[sheetID].divHTML;
 
         console.log(code)
         if(code.indexOf('=') == -1){return -1;}
@@ -268,7 +283,6 @@ export class WidgetsOnGrid{
                     }
                 }
                 if(code.charAt(i) == '"'){endChar = i; currentDiv.setAttribute(attName, code.slice(0+1,i));}
-                console.log(code.slice(0+1,i))
                 i++;
             }
             
@@ -283,14 +297,17 @@ export class WidgetsOnGrid{
         document.getElementById(targetElementID).appendChild(currentDiv);
     }
 
-    static checkFixInputSize(widgetList, index){
-        let minWidth = widgetList[index].WidgetData.sizeLimits.MinWidth;
-        let maxWidth = widgetList[index].WidgetData.sizeLimits.MaxWidth;
-        let minHeight = widgetList[index].WidgetData.sizeLimits.MinHeight;
-        let maxHeight = widgetList[index].WidgetData.sizeLimits.MaxHeight;
+    static checkFixInputSize(instance, widgetID){
+        let template = WidgetsOnGrid.getWidgetTemplate(instance.widgetList[widgetID].name);
+        console.log(template);
+
+        let minWidth = template.sizeLimits.MinWidth;
+        let maxWidth = template.sizeLimits.MaxWidth;
+        let minHeight = template.sizeLimits.MinHeight;
+        let maxHeight = template.sizeLimits.MaxHeight;
     
-        let targetWidth = widgetList[index].size.width;
-        let targetHeight = widgetList[index].size.height;
+        let targetWidth = instance.widgetList[widgetID].size.width;
+        let targetHeight = instance.widgetList[widgetID].size.height;
     
         if(targetWidth < minWidth){console.warn('Widget width of ' + targetWidth + ' is too small, using: ' + minWidth); targetWidth = minWidth;}
         if(targetWidth > maxWidth){console.warn('Widget width of ' + targetWidth + ' is too large, using: ' + maxWidth); targetWidth = maxWidth;}
@@ -298,71 +315,80 @@ export class WidgetsOnGrid{
         if(targetHeight < minHeight){console.warn('Widget height of ' + targetHeight + ' is too small, using: ' + minHeight); targetHeight = minHeight;}
         if(targetHeight > maxHeight){console.warn('Widget height of ' + targetHeight + ' is too large, using: ' + maxHeight); targetHeight = maxHeight;}
     
-        widgetList[index].size.width = targetWidth;
-        widgetList[index].size.height = targetHeight;
+        instance.widgetList[widgetID].size.width = targetWidth;
+        instance.widgetList[widgetID].size.height = targetHeight;
 
-        WidgetsOnGrid.checkAspectRatio(widgetList, index);
+        //WidgetsOnGrid.checkAspectRatio(widgetList, widgetID);
 
         return;
     }
 
-    static checkAspectRatio(widgetList, index){
+    static getWidgetTemplate(widgetName){
+        console.log(widgetName);
+        console.log(this.grid.widgetSheet);
 
-        console.log(widgetList[index].WidgetData.acceptableAspectRatios[0])
-    
+        let currentTemplate;
         let i = 0;
-    
         while(1){
-            if(widgetList[index].WidgetData.acceptableAspectRatios[i] === undefined){break;}
-    
-            let targetAspectRatioWidth = widgetList[index].WidgetData.acceptableAspectRatios[i].width;
-            let targetAspectRatioHeight = widgetList[index].WidgetData.acceptableAspectRatios[i].height;
-    
-            let targetWidth = widgetList[index].size.width;
-            let targetHeight = widgetList[index].size.height;
-        
-            if(targetAspectRatioWidth/targetAspectRatioHeight == targetWidth/targetHeight){return;}
+            currentTemplate = this.grid.widgetSheet.data[i];
+            if(currentTemplate === undefined){break;}
+
+            if(currentTemplate.name == widgetName){break;};
             i++;
         }
-    
-        console.warn('wrong aspectRatio');
+        return currentTemplate;
+
     }
 
-    static async fetchData(instance, widgetID, widgetName){
-        instance.widgetList[widgetID].busy = true;
+//    static checkAspectRatio(widgetList, index){
+//
+//        console.log(widgetList[index].WidgetData.acceptableAspectRatios[0])
+//    
+//        let i = 0;
+//    
+//        while(1){
+//            if(widgetList[index].WidgetData.acceptableAspectRatios[i] === undefined){break;}
+//    
+//            let targetAspectRatioWidth = widgetList[index].WidgetData.acceptableAspectRatios[i].width;
+//            let targetAspectRatioHeight = widgetList[index].WidgetData.acceptableAspectRatios[i].height;
+//    
+//            let targetWidth = widgetList[index].size.width;
+//            let targetHeight = widgetList[index].size.height;
+//        
+//            if(targetAspectRatioWidth/targetAspectRatioHeight == targetWidth/targetHeight){return;}
+//            i++;
+//        }
+//    
+//        console.warn('wrong aspectRatio');
+//    }
+
+    static async fetchWidgetDataFromJson(widgetName){
+        if(WidgetsOnGrid.grid.widgetSheet.busy == true){return;};
+        WidgetsOnGrid.grid.widgetSheet.busy = true;
 
         let data = await fetch('./widgets.json')
         let out = await data.json();
         {
             if(await out[widgetName] === undefined){console.error("widget not found")}
             else{
-                instance.widgetList[widgetID].busy = false;
+                WidgetsOnGrid.grid.widgetSheet.busy = false;
                 let testCode = new parseWidgetCode(out[widgetName]);
                 testCode = testCode.get();
-                instance.widgetList[widgetID].WidgetData.divHTML = testCode.divHTML;
-                instance.widgetList[widgetID].WidgetData.jsSetup = testCode.jsSetup;
-                instance.widgetList[widgetID].WidgetData.jsFunction = testCode.jsFunction;
-                instance.widgetList[widgetID].WidgetData.jsUnsetup = testCode.jsUnsetup;
-                instance.widgetList[widgetID].WidgetData.widgetStructure = testCode.widgetStructure;
-                instance.widgetList[widgetID].WidgetData.sizeLimits = testCode.sizeLimits;
-
-                WidgetsOnGrid.widgetCode.push({widget: widgetName, code: instance.widgetList[widgetID].WidgetData.jsFunction});
+                WidgetsOnGrid.grid.widgetSheet.data.push(testCode);
 
                 return out[widgetName];
             }
         }
     }
+
     
-    static waitForJsonWidget(gridInstance, targetWidgetIndex, targetFunction, retries = 50){ //todo move to separete function
+    static ifBusyCallFunction(targetFunction, retries = 8){ //todo move to separete function
             if(retries <= 0){console.warn('unable to setup widget'); return;}
             retries--;
 
-            console.log(gridInstance);
 
-            if(gridInstance.widgetList[targetWidgetIndex].busy){
-                console.log(gridInstance.widgetList[targetWidgetIndex].busy);
-
-                setTimeout(function(){WidgetsOnGrid.waitForJsonWidget(gridInstance, targetWidgetIndex, targetFunction, retries);}, 10);
+            if(WidgetsOnGrid.grid.widgetSheet.busy){
+                setTimeout(function(){WidgetsOnGrid.ifBusyCallFunction(targetFunction, retries);}, 500);
             }
             else{
                 targetFunction();

@@ -12,5 +12,19 @@
         "jsUnsetup": "",
         "divHTML": "onclick=\"WidgetsOnGrid.runWidgetCode('powerButton')\""
 
+    },
+
+    "extruderTempreature": {
+        "name": "extruderTempreature",
+        "sizeLimits": {"MinWidth": 2, "MaxWidth": 2, "MinHeight": 1, "MaxHeight": 1},
+        "widgetStructure": "let div = []; div[1] = document.createElement('img'); div[1].src = './extruderIcon.svg'; div[1].classList.add($/$addSize$/$(1, 1)); div[0] = document.createElement('div'); div[0] = ManageDiv.passed.css.addCode(div[0], 'background-color: white', 'widgetsStyle'); div[0] = ManageDiv.passed.css.addCode(div[0], 'display: flex', 'widgetsStyle'); div[0] = ManageDiv.passed.css.addCode(div[0], 'flex-wrap: wrap', 'widgetsStyle'); div[0] = ManageDiv.passed.css.addCode(div[0], 'border-radius: 10px', 'widgetsStyle'); div[0] = ManageDiv.passed.css.addCode(div[0], 'justify-content: space-between', 'widgetsStyle');",
+
+        "dependentVars": {"printerPowerStatus": "printerPowerStatus"},
+        "shortenedValues": [],
+        "jsSetup": "",
+        "jsFunction": "",
+        "jsUnsetup": "",
+        "divHTML": "onclick=\"WidgetsOnGrid.runWidgetCode('extruderTempreature')\""
+
     }
 }
