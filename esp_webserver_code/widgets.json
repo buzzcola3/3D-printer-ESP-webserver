@@ -17,14 +17,26 @@
     "extruderTempreature": {
         "name": "extruderTempreature",
         "sizeLimits": {"MinWidth": 2, "MaxWidth": 2, "MinHeight": 1, "MaxHeight": 1},
-        "widgetStructure": "let div = []; div[2] = document.createElement('div'); div[2] = $/$addCssCode$/$(div[2], 'font-weight: 700'); div[2] = $/$addCssCode$/$(div[2], 'text-align: center'); div[2] = $/$addCssCode$/$(div[2], 'line-height: 50px'); div[2].innerText = '50°C'; div[2].classList.add($/$addSize$/$(1, 1)); div[1] = document.createElement('img'); div[1].src = './extruderIcon.svg'; div[1].classList.add($/$addSize$/$(1, 1)); div[0] = document.createElement('div'); div[0] = $/$addCssCode$/$(div[0], 'background-color: white'); div[0] = $/$addCssCode$/$(div[0], 'display: flex'); div[0] = $/$addCssCode$/$(div[0], 'flex-wrap: wrap'); div[0] = $/$addCssCode$/$(div[0], 'border-radius: 10px'); div[0] = $/$addCssCode$/$(div[0], 'justify-content: space-between'); div[0].appendChild(div[1]); div[1] = undefined; div[0].appendChild(div[2]); div[2] = undefined; return div[0];",
+        "widgetStructure": "let div = []; div[2] = document.createElement('div'); $/$addCssCode$/$(div[2], 'font-weight: 700'); $/$addCssCode$/$(div[2], 'text-align: center'); $/$addCssCode$/$(div[2], 'line-height: 50px'); div[2].innerText = '50°C'; div[2].classList.add($/$addSize$/$(1, 1)); div[1] = document.createElement('img'); div[1].src = './extruderIcon.svg'; div[1].classList.add($/$addSize$/$(1, 1)); div[0] = document.createElement('div'); $/$addCssCode$/$(div[0], 'background-color: white'); $/$addCssCode$/$(div[0], 'display: flex'); $/$addCssCode$/$(div[0], 'flex-wrap: wrap'); $/$addCssCode$/$(div[0], 'border-radius: 10px'); $/$addCssCode$/$(div[0], 'justify-content: space-between'); div[0].appendChild(div[1]); div[0].appendChild(div[2]); return div[0];",
 
-        "dependentVars": {"printerPowerStatus": "printerPowerStatus"},
         "shortenedValues": [],
         "jsSetup": "",
         "jsFunction": "",
         "jsUnsetup": "",
         "divHTML": "onclick=\"WidgetsOnGrid.runWidgetCode('extruderTempreature')\""
+
+    },
+
+    "widgetCreator": {
+        "name": "widgetCreator",
+        "sizeLimits": {"MinWidth": 6, "MaxWidth": 6, "MinHeight": 5, "MaxHeight": 5},
+        "widgetStructure": "let data = [{}]; data[0].div = document.createElement('div'); data[0].css = document.createElement('style'); $/$addCssCode$/$(data[0].div, 'background-color: white', data[0].css); $/$addCssCode$/$(data[0].div, 'border-radius: 10px', data[0].css); $/$subGrid$/$(data[0].div); console.log(data); return data[0];",
+
+        "shortenedValues": [],
+        "jsSetup": "",
+        "jsFunction": "",
+        "jsUnsetup": "",
+        "divHTML": "onclick=\"WidgetsOnGrid.runWidgetCode('widgetCreator')\""
 
     }
 }

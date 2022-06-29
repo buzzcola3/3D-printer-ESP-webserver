@@ -21,17 +21,17 @@ export var ManageCss = {
             }
         },
 
-        create: function(cssCode, cssElementID){
+        create: function(cssCode, cssElement){
             if(cssCode.indexOf('.') == -1){console.warn('not a valid CSS');}
 
-            if (document.getElementById(cssElementID) === null){
-                let newEl = document.createElement('style');
-                newEl.id = cssElementID;
-                document.getElementsByTagName('head')[0].appendChild(newEl);
-            }
+          //  if (cssElement === null){
+             //   let newEl = document.createElement('style');
+             //   newEl.id = cssElementID;
+            //    document.getElementsByTagName('head')[0].appendChild(newEl);
+           // }
 
-            if(document.getElementById(cssElementID).innerHTML.includes(cssCode)){return;}
-            document.getElementById(cssElementID).innerHTML += cssCode;
+            if(cssElement.innerHTML.includes(cssCode)){return;}
+            cssElement.innerHTML += cssCode;
             return;
         },
         

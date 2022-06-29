@@ -12,23 +12,23 @@ export var ManageGrid = {
             let width = instance.gridWidth;
 
 
-            let gridDiv = document.createElement('div')
-            ManageDiv.passed.css.addCode(gridDiv, 'margin: 0 auto', instance.targetCssID);
-            ManageDiv.passed.css.addCode(gridDiv, 'top: 50%', instance.targetCssID);
-            ManageDiv.passed.css.addCode(gridDiv, 'transform: translateY(-50%)', instance.targetCssID);
+            let gridDiv = document.createElement('div');
+            let gridCss = document.createElement('style');
 
-            ManageDiv.passed.css.addCode(gridDiv, 'display: grid', instance.targetCssID);
-            ManageDiv.passed.css.addCode(gridDiv, 'justify-items: center', instance.targetCssID);
-            ManageDiv.passed.css.addCode(gridDiv, 'grid-template-columns: repeat(' + width + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', instance.targetCssID);
-            ManageDiv.passed.css.addCode(gridDiv, 'grid-template-rows: repeat('+ height +',' + instance.gridSegmentHeight + instance.sizeUnit + ')', instance.targetCssID);
-            ManageDiv.passed.css.addCode(gridDiv, 'row-gap:' + instance.gridSegmentLeftGap + instance.sizeUnit, instance.targetCssID);
-            ManageDiv.passed.css.addCode(gridDiv, 'column-gap:' + instance.gridSegmentTopGap + instance.sizeUnit, instance.targetCssID);
-            ManageDiv.passed.css.addCode(gridDiv, 'overflow: auto', instance.targetCssID);
-            ManageDiv.passed.css.addCode(gridDiv, 'position: relative', instance.targetCssID);
-            console.log(gridDiv);
+            ManageDiv.passed.css.addCode(gridDiv, 'margin: 0 auto', gridCss);
+            ManageDiv.passed.css.addCode(gridDiv, 'top: 50%', gridCss);
+            ManageDiv.passed.css.addCode(gridDiv, 'transform: translateY(-50%)', gridCss);
 
-            document.getElementById(instance.gridID).classList += gridDiv.classList;
-            return;
+            ManageDiv.passed.css.addCode(gridDiv, 'display: grid', gridCss);
+            ManageDiv.passed.css.addCode(gridDiv, 'justify-items: center', gridCss);
+            ManageDiv.passed.css.addCode(gridDiv, 'grid-template-columns: repeat(' + width + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', gridCss);
+            ManageDiv.passed.css.addCode(gridDiv, 'grid-template-rows: repeat('+ height +',' + instance.gridSegmentHeight + instance.sizeUnit + ')', gridCss);
+            ManageDiv.passed.css.addCode(gridDiv, 'row-gap:' + instance.gridSegmentLeftGap + instance.sizeUnit, gridCss);
+            ManageDiv.passed.css.addCode(gridDiv, 'column-gap:' + instance.gridSegmentTopGap + instance.sizeUnit, gridCss);
+            ManageDiv.passed.css.addCode(gridDiv, 'overflow: auto', gridCss);
+            ManageDiv.passed.css.addCode(gridDiv, 'position: relative', gridCss);
+
+            return {gridCss: gridCss, gridDiv: gridDiv};
         },
 
         update: {
@@ -140,11 +140,6 @@ export var ManageGrid = {
             let topGapPx = instance.gridSegmentTopGap * (height-1);
 
         
-            
-            //let cssCode = '.grid_' + xmin + '-' + xmax + '_' + ymin + '-' + ymax;
-            //let className = cssCode.slice(1); //grid_X-X_X-X
-        
-            console.log(targetCssID);
 
             ManageDiv.passed.css.addCode(targetElement, 'height: ' + (heightPx + topGapPx) + instance.sizeUnit, targetCssID);
             ManageDiv.passed.css.addCode(targetElement, 'width: ' + (widthPx + leftGapPx) + instance.sizeUnit, targetCssID);
@@ -159,7 +154,6 @@ export var ManageGrid = {
 
         css: {
             sizeClass: function(width, height, instance){ //user
-                console.log(instance.targetCssID)
 
                 let cssCode = '.grid_' + width + 'x' + height;
             

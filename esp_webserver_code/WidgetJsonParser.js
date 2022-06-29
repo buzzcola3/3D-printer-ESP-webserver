@@ -29,27 +29,24 @@ export class parseWidgetCode{
 
         divHTML = parseWidgetCode.replaceShorts(divHTML, shortenedValues);
         this.divHTML = divHTML;
-        console.log(this.divHTML)
 
-        jsSetup = parseWidgetCode.replaceFunctions(jsSetup, gridDivID); //done
-        jsSetup = parseWidgetCode.replaceShorts(jsSetup, shortenedValues) //done
-        console.log(jsSetup)
+        jsSetup = parseWidgetCode.replaceFunctions(jsSetup, gridDivID);
+        jsSetup = parseWidgetCode.replaceShorts(jsSetup, shortenedValues)
         jsSetup = new Function('', jsSetup);
         this.jsSetup = jsSetup;
 
-        jsFunction = parseWidgetCode.replaceFunctions(jsFunction, gridDivID); //done
-        jsFunction = parseWidgetCode.replaceShorts(jsFunction, shortenedValues) //done
+        jsFunction = parseWidgetCode.replaceFunctions(jsFunction, gridDivID);
+        jsFunction = parseWidgetCode.replaceShorts(jsFunction, shortenedValues)
         jsFunction = new Function('', jsFunction);
         this.jsFunction = jsFunction;
 
-        jsUnsetup = parseWidgetCode.replaceFunctions(jsUnsetup, gridDivID); //done
-        jsUnsetup = parseWidgetCode.replaceShorts(jsUnsetup, shortenedValues) //done
+        jsUnsetup = parseWidgetCode.replaceFunctions(jsUnsetup, gridDivID); 
+        jsUnsetup = parseWidgetCode.replaceShorts(jsUnsetup, shortenedValues)
         jsUnsetup = new Function('', jsUnsetup);
         this.jsUnsetup = jsUnsetup;
 
-        widgetStructure = parseWidgetCode.replaceShorts(widgetStructure, shortenedValues); //done
+        widgetStructure = parseWidgetCode.replaceShorts(widgetStructure, shortenedValues);
         widgetStructure = parseWidgetCode.replaceFunctions(widgetStructure, gridDivID);
-        console.log(widgetStructure);
         widgetStructure = new Function('', widgetStructure);
         this.widgetStructure = widgetStructure;
 
@@ -105,6 +102,19 @@ export class parseWidgetCode{
             rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
 
             rawString = rawString.replace(toBeReplaced, 'tools.addCssCode' + '(' + this.curFuncVarsToString() + ')');
+            this.currentFunctionVars = undefined;
+        }
+
+        while(rawString.includes('$/$subGrid$/$')){
+            let toBeReplaced = '$/$subGrid$/$'
+
+            let startOfVar = rawString.indexOf(toBeReplaced)+1;
+            startOfVar = startOfVar + toBeReplaced.length;
+
+            rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
+            this.currentFunctionVars.push("'" + gridDivID + "'");
+
+            rawString = rawString.replace(toBeReplaced, 'tools.createSubGrid' + '(' + this.curFuncVarsToString() + ')');
             this.currentFunctionVars = undefined;
         }
 
@@ -167,8 +177,6 @@ export class parseWidgetCode{
 
 
     static replaceShorts(rawString, shortenedValues){
-        console.log(shortenedValues[0]);
-        
         let i = 0;
         while(1){
             if(shortenedValues[i] === undefined){break;}

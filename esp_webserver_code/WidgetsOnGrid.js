@@ -28,11 +28,18 @@ export class WidgetsOnGrid{
 
         this.create = this.create;
 
+        //todo make instance hidable (leave empty div on screen), when hidden the code is inside instance
+        //make it hidden by default --> construct the whole thing inside instance (do not touch document, until finished)
+        //when hiding, copy the targetDivID content to the instance var
+        //when exposing, copy the instance var content to targetDivID and make the instanceVar a FUNCTION that returns the content from document
 
-        WidgetsOnGrid.grid.instances.push({ // ----------------<-----------------<------- USE THIZ
-            widgetList: [],
+        WidgetsOnGrid.grid.instances.push({
+            hidden: true,
             targetDivID: targetDivID,
+            DivData: undefined,
             targetCssID: targetCssID,
+            CssData: undefined,
+            widgetList: [],
             gridID: gridID,
             gridSegmentWidth: gridSegmentWidth,
             gridSegmentHeight: gridSegmentHeight,
@@ -48,11 +55,16 @@ export class WidgetsOnGrid{
         let instance = WidgetsOnGrid.assignInstanceNumber(targetDivID)
         this.instance = instance;
         
+        let gridInstance = WidgetsOnGrid.grid.instances[instance];
 
         window.onresize = WidgetsOnGrid.resizeHandler;
-        document.getElementById(gridID).addEventListener('pointermove', (data) => {ManageGrid.get.pointerPosition(WidgetsOnGrid.grid.instances[instance], data)})
+        document.getElementById(gridID).addEventListener('pointermove', (data) => {ManageGrid.get.pointerPosition(gridInstance, data)})
 
-        ManageGrid.main.create(WidgetsOnGrid.grid.instances[instance]);
+        let data = ManageGrid.main.create(gridInstance);
+        gridInstance.DivData = data.gridDiv;
+        gridInstance.CssData = data.gridCss;
+
+        console.log(gridInstance);
     }
 
     static grid = {instances: [], widgetSheet: {data: [], busy: false}};
@@ -73,9 +85,6 @@ export class WidgetsOnGrid{
         let newWidgetID = WidgetsOnGrid.getListId(widget, height, width, posX, posY, gridInstance);
 
 
-        
-
-        //console.log(this.gridID);
             WidgetsOnGrid.checkFixInputSize(gridInstance, newWidgetID);
 
             let newWidgetDiv;
@@ -204,8 +213,6 @@ export class WidgetsOnGrid{
 
 
     static getListId(widget, height, width, posX, posY, instance){
-        console.log(instance.widgetList);
-        console.log(instance)
         let newWidget = {
             Index: undefined,
             name: widget,
@@ -259,11 +266,9 @@ export class WidgetsOnGrid{
     }
 
     static appendElementAttributes(currentDiv, widgetName){
-        console.log(currentDiv)
         let sheetID = WidgetsOnGrid.findWidgetInSheet(widgetName);
-        let code = WidgetsOnGrid.grid.widgetSheet.data[sheetID].divHTML;
+        let code = WidgetsOnGrid.grid.widgetSheet.data[sheetID].divHTML
 
-        console.log(code)
         if(code.indexOf('=') == -1){return -1;}
 
         let attName = code.slice(0, code.indexOf('='))
@@ -295,12 +300,12 @@ export class WidgetsOnGrid{
     }
 
     static placeDivOnScreen(currentDiv, targetElementID){
-        console.log(currentDiv);
         document.getElementById(targetElementID).appendChild(currentDiv);
     }
 
     static checkFixInputSize(instance, widgetID){
         let template = WidgetsOnGrid.getWidgetTemplate(instance.widgetList[widgetID].name);
+
         console.log(template);
 
         let minWidth = template.sizeLimits.MinWidth;
@@ -326,14 +331,13 @@ export class WidgetsOnGrid{
     }
 
     static getWidgetTemplate(widgetName){
-        console.log(widgetName);
-        console.log(this.grid.widgetSheet);
+        console.log(this.grid.widgetSheet.data);
 
         let currentTemplate;
         let i = 0;
         while(1){
             currentTemplate = this.grid.widgetSheet.data[i];
-            if(currentTemplate === undefined){break;}
+            if(currentTemplate === undefined){return;}
 
             if(currentTemplate.name == widgetName){break;};
             i++;
@@ -364,8 +368,14 @@ export class WidgetsOnGrid{
 //        console.warn('wrong aspectRatio');
 //    }
 
-    static async fetchWidgetDataFromJson(widgetName, instanceNum){
-        if(WidgetsOnGrid.grid.widgetSheet.busy == true){return;};
+    static async fetchWidgetDataFromJson(widgetName, instanceNum, retry = 0){
+        if(WidgetsOnGrid.grid.widgetSheet.busy == true){
+            retry++;
+            if(retry ==  20){return;}
+            setTimeout( function(){WidgetsOnGrid.fetchWidgetDataFromJson(widgetName, instanceNum, retry)}, 100);
+            return;
+        };
+        console.log('fetching: ' + widgetName)
         WidgetsOnGrid.grid.widgetSheet.busy = true;
 
         let data = await fetch('./widgets.json')
@@ -379,8 +389,9 @@ export class WidgetsOnGrid{
                 let testCode = new parseWidgetCode(out[widgetName], gridInstance);
                 testCode = testCode.get();
                 WidgetsOnGrid.grid.widgetSheet.data.push(testCode);
+                
 
-                return out[widgetName];
+                return;
             }
         }
     }
