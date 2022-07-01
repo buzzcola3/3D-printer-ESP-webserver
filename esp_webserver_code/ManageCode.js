@@ -44,15 +44,21 @@ export function removeLineOfcode(classes, code){
     if(document.getElementById('managedCode').innerText.includes(cssClassName)){
         if(getIndexValue(cssClassName) > 0){
             setIndexValue(cssClassName, getIndexValue(cssClassName)-1)
-        }else{
+        }
             if(getIndexValue(cssClassName) <= 0){
                 let classTextToRemove = fullClassText +  '/*' + getIndexValue(cssClassName) + '*/';
                 document.getElementById('managedCode').innerHTML = document.getElementById('managedCode').innerHTML.replace(classTextToRemove, '')
             }
-        }
+        
 
         return classes;
     }
+    return classes;
+}
+
+export function replaceLineOfCode(classes, oldCode, newCode){
+    classes = removeLineOfcode(classes, oldCode);
+    classes = addLineOfcode(classes, newCode);
     return classes;
 }
 

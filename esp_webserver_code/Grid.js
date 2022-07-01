@@ -1,6 +1,8 @@
 import {ManageCss, ManageWidget} from "./ManageCss.js";
-import { ManageDiv } from "./ManageDiv.js";
+import {ManageDiv} from "./ManageDiv.js";
 
+import {addLineOfcode, removeLineOfcode, replaceLineOfCode} from "./ManageCode.js";
+import { WidgetsOnGrid } from "./WidgetsOnGrid.js";
 
 export var ManageGrid = {
     main: {
@@ -12,23 +14,22 @@ export var ManageGrid = {
             let width = instance.gridWidth;
 
 
-            let gridDiv = document.createElement('div');
-            let gridCss = document.createElement('style');
+            let gridDiv = instance.DivData
 
-            ManageDiv.passed.css.addCode(gridDiv, 'margin: 0 auto', gridCss);
-            ManageDiv.passed.css.addCode(gridDiv, 'top: 50%', gridCss);
-            ManageDiv.passed.css.addCode(gridDiv, 'transform: translateY(-50%)', gridCss);
+            gridDiv = addLineOfcode(gridDiv, 'margin: 0 auto');
+            gridDiv = addLineOfcode(gridDiv, 'top: 50%');
+            gridDiv = addLineOfcode(gridDiv, 'transform: translateY(-50%)');
 
-            ManageDiv.passed.css.addCode(gridDiv, 'display: grid', gridCss);
-            ManageDiv.passed.css.addCode(gridDiv, 'justify-items: center', gridCss);
-            ManageDiv.passed.css.addCode(gridDiv, 'grid-template-columns: repeat(' + width + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', gridCss);
-            ManageDiv.passed.css.addCode(gridDiv, 'grid-template-rows: repeat('+ height +',' + instance.gridSegmentHeight + instance.sizeUnit + ')', gridCss);
-            ManageDiv.passed.css.addCode(gridDiv, 'row-gap:' + instance.gridSegmentLeftGap + instance.sizeUnit, gridCss);
-            ManageDiv.passed.css.addCode(gridDiv, 'column-gap:' + instance.gridSegmentTopGap + instance.sizeUnit, gridCss);
-            ManageDiv.passed.css.addCode(gridDiv, 'overflow: auto', gridCss);
-            ManageDiv.passed.css.addCode(gridDiv, 'position: relative', gridCss);
+            gridDiv = addLineOfcode(gridDiv, 'display: grid');
+            gridDiv = addLineOfcode(gridDiv, 'justify-items: center');
+            gridDiv = addLineOfcode(gridDiv, 'grid-template-columns: repeat(' + width + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')');
+            gridDiv = addLineOfcode(gridDiv, 'grid-template-rows: repeat('+ height +',' + instance.gridSegmentHeight + instance.sizeUnit + ')');
+            gridDiv = addLineOfcode(gridDiv, 'row-gap:' + instance.gridSegmentLeftGap + instance.sizeUnit);
+            gridDiv = addLineOfcode(gridDiv, 'column-gap:' + instance.gridSegmentTopGap + instance.sizeUnit);
+            gridDiv = addLineOfcode(gridDiv, 'overflow: auto');
+            gridDiv = addLineOfcode(gridDiv, 'position: relative');
 
-            return {gridCss: gridCss, gridDiv: gridDiv};
+            return gridDiv;
         },
 
         update: {
@@ -42,18 +43,18 @@ export var ManageGrid = {
                 let newHeight = instance.gridHeight
                 let newWidth = instance.gridWidth
 
+                let newDivData = instance.DivData;
 
-                if(oldHeight == newHeight && oldWidth == newWidth){return;}
+                if(oldHeight == newHeight && oldWidth == newWidth){return newDivData;}
 
-                //console.log('grid-template-columns: repeat(' + oldWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')')
-                //.log('grid-template-columns: repeat(' + newWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')')
-                ManageDiv.existing.css.replaceCode('grid-template-columns: repeat(' + oldWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', 'grid-template-columns: repeat(' + newWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', instance.CssData);
-                ManageDiv.existing.css.replaceCode('grid-template-rows: repeat('+ oldHeight +',' + instance.gridSegmentHeight + instance.sizeUnit + ')','grid-template-rows: repeat('+ newHeight +',' + instance.gridSegmentHeight + instance.sizeUnit + ')', instance.CssData);
+                newDivData = replaceLineOfCode(newDivData, 'grid-template-columns: repeat(' + oldWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', 'grid-template-columns: repeat(' + newWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')');
+                newDivData = replaceLineOfCode(newDivData, 'grid-template-rows: repeat('+ oldHeight +',' + instance.gridSegmentHeight + instance.sizeUnit + ')','grid-template-rows: repeat('+ newHeight +',' + instance.gridSegmentHeight + instance.sizeUnit + ')');
 
                 if(instance.hidden == false){
-                    
+
                 }
                 //loop through instance, and replace 
+                return newDivData;
             },
 
         },

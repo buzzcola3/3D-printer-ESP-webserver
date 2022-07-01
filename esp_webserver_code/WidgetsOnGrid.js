@@ -4,15 +4,6 @@ import {ManageDiv} from "./ManageDiv.js";
 import {ManageGrid} from "./grid.js";
 import {parseWidgetCode} from "./WidgetJsonParser.js";
 
-let classes = document.createElement('div');
-addLineOfcode(classes, 'text-align: center')
-addLineOfcode(classes, 'text-align: center')
-addLineOfcode(classes, 'text-align: center')
-
-removeLineOfcode(classes, 'text-align: center');
-removeLineOfcode(classes, 'text-align: center');
-removeLineOfcode(classes, 'text-align: center');
-
 
 
 export class WidgetsOnGrid{
@@ -46,9 +37,8 @@ export class WidgetsOnGrid{
         WidgetsOnGrid.grid.instances.push({
             hidden: true,
             targetDivID: targetDivID,
-            DivData: undefined,
+            DivData: document.createElement('div'),
             targetCssID: targetCssID,
-            CssData: undefined,
             widgetList: [],
             gridID: gridID,
             gridSegmentWidth: gridSegmentWidth,
@@ -70,9 +60,7 @@ export class WidgetsOnGrid{
         window.onresize = WidgetsOnGrid.resizeHandler;
         document.getElementById(gridID).addEventListener('pointermove', (data) => {ManageGrid.get.pointerPosition(gridInstance, data)})
 
-        let data = ManageGrid.main.create(gridInstance);
-        gridInstance.DivData = data.gridDiv;
-        gridInstance.CssData = data.gridCss;
+        gridInstance.DivData = ManageGrid.main.create(gridInstance);
 
         console.log(gridInstance);
     }
@@ -128,7 +116,7 @@ export class WidgetsOnGrid{
         let oldPosY = gridInstance.widgetList[targetWidgetIndex].TopLeftPosition.Y;
 
         let newPosX = oldPosX + TopLeftModifiers.X;
-        let newPosY = oldPosY + TopLeftModifiers.Y;
+        let newPosY = oldPosY + TopLeftModifiers.Y;nsatnce
 
         let newTopLeftPosition = {X: newPosX, Y: newPosY};
 
@@ -168,7 +156,7 @@ export class WidgetsOnGrid{
         let i = 0;
         while(1){
             if(WidgetsOnGrid.grid.instances[i] === undefined){break;}
-            ManageGrid.main.update.size(WidgetsOnGrid.grid.instances[i]);
+            WidgetsOnGrid.grid.instances[i].DivData = ManageGrid.main.update.size(WidgetsOnGrid.grid.instances[i]);
             i++;
         }
     }
@@ -326,7 +314,6 @@ export class WidgetsOnGrid{
         
 
         document.getElementById(gridInstance.gridID).appendChild(gridInstance.DivData);
-        document.getElementById('widgetsStyle').innerHTML = gridInstance.CssData.innerHTML;
 
         gridInstance.hidden = false;
         //document.getElementById(targetElementID).appendChild(elements.div);
