@@ -1,7 +1,17 @@
-import {ManageCss} from "./ManageCss.js";
+import {addLineOfcode} from "./ManageCode.js";
+import {removeLineOfcode} from "./ManageCode.js";
 import {ManageDiv} from "./ManageDiv.js";
 import {ManageGrid} from "./grid.js";
 import {parseWidgetCode} from "./WidgetJsonParser.js";
+
+let classes = document.createElement('div');
+addLineOfcode(classes, 'text-align: center')
+addLineOfcode(classes, 'text-align: center')
+addLineOfcode(classes, 'text-align: center')
+
+removeLineOfcode(classes, 'text-align: center');
+removeLineOfcode(classes, 'text-align: center');
+removeLineOfcode(classes, 'text-align: center');
 
 
 
@@ -87,13 +97,18 @@ export class WidgetsOnGrid{
 
             WidgetsOnGrid.checkFixInputSize(gridInstance, newWidgetID);
 
-            let newWidgetDiv;
-            newWidgetDiv = WidgetsOnGrid.createWidgetContent(widget);
-            newWidgetDiv = WidgetsOnGrid.appendWidgetID(gridInstance, newWidgetDiv, newWidgetID);
-            newWidgetDiv = WidgetsOnGrid.appendGridPositionClass(newWidgetDiv, gridInstance, newWidgetID);
-            //newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, gridInstance.widgetList, newWidgetID);
-            newWidgetDiv = WidgetsOnGrid.appendElementAttributes(newWidgetDiv, widget);
-            WidgetsOnGrid.placeDivOnScreen(newWidgetDiv, gridInstance.gridID);
+            let data = {div: undefined, css: undefined}
+            {
+                data = WidgetsOnGrid.createWidgetContent(widget);
+                data = WidgetsOnGrid.appendWidgetID(gridInstance, data, newWidgetID);
+                data = WidgetsOnGrid.appendGridPositionClass(data, gridInstance, newWidgetID);
+                //newWidgetDiv = WidgetsOnGrid.appendWidgetSize(newWidgetDiv, gridInstance.widgetList, newWidgetID);
+                data = WidgetsOnGrid.appendElementAttributes(data, widget);
+            }
+            gridInstance.widgetList[newWidgetID].elements = data;
+
+
+            WidgetsOnGrid.displayGridOnScreen(gridInstance, newWidgetID);
 
             let templateSheetID = WidgetsOnGrid.findWidgetInSheet(widget);
             this.grid.widgetSheet.data[templateSheetID].jsSetup();
@@ -158,15 +173,15 @@ export class WidgetsOnGrid{
         }
     }
 
-    static appendGridPositionClass(targetElement, instance, index){
+    static appendGridPositionClass(widgetData, instance, index){
         let height = instance.widgetList[index].size.height;
         let width = instance.widgetList[index].size.width;
         let topLeft = instance.widgetList[index].TopLeftPosition;
 
         let targetCssID = 'grid_' + instance.targetDivID + '-WidgetID_' + index;
     
-        targetElement = ManageGrid.create.positionClass(instance, targetElement, targetCssID, width, height, topLeft);
-        return targetElement;
+        widgetData = ManageGrid.create.positionClass(instance, widgetData, targetCssID, width, height, topLeft);
+        return widgetData;
     }
 
     static updateGridPositionClass(instance, targetWidgetIndex, newTopLeftPosition,){
@@ -214,6 +229,8 @@ export class WidgetsOnGrid{
 
     static getListId(widget, height, width, posX, posY, instance){
         let newWidget = {
+            hidden: true,
+            elements: {div: '', css: ''},
             Index: undefined,
             name: widget,
             rotated: 0,
@@ -247,6 +264,8 @@ export class WidgetsOnGrid{
     static createWidgetContent(widgetName){
         let sheetID = WidgetsOnGrid.findWidgetInSheet(widgetName);
         let widgetStructure = WidgetsOnGrid.grid.widgetSheet.data[sheetID].widgetStructure();
+        console.log(widgetStructure);
+
         if(widgetStructure === undefined){return document.createElement('div');}
         return widgetStructure;
     }
@@ -260,12 +279,12 @@ export class WidgetsOnGrid{
         }
     }
 
-    static appendWidgetID(instance, currentDiv, index){
-        currentDiv.id = instance.targetDivID + '_widgetID_' + index;
-        return currentDiv;
+    static appendWidgetID(instance, widgetData, index){
+        widgetData.div.id = instance.targetDivID + '_widgetID_' + index;
+        return widgetData;
     }
 
-    static appendElementAttributes(currentDiv, widgetName){
+    static appendElementAttributes(currentElements, widgetName){
         let sheetID = WidgetsOnGrid.findWidgetInSheet(widgetName);
         let code = WidgetsOnGrid.grid.widgetSheet.data[sheetID].divHTML
 
@@ -289,18 +308,28 @@ export class WidgetsOnGrid{
                         if(code.charAt(i) == ''){console.warn('element attribute syntax Error'); break;}
                     }
                 }
-                if(code.charAt(i) == '"'){endChar = i; currentDiv.setAttribute(attName, code.slice(0+1,i));}
+                if(code.charAt(i) == '"'){endChar = i; currentElements.div.setAttribute(attName, code.slice(0+1,i));}
                 i++;
             }
             
             code = code.slice(endChar+1);
             i++;
         }
-        return currentDiv;
+        return currentElements;
     }
 
-    static placeDivOnScreen(currentDiv, targetElementID){
-        document.getElementById(targetElementID).appendChild(currentDiv);
+    static displayGridOnScreen(gridInstance, widgetID){
+        console.log('todo')
+        console.log(gridInstance)
+        console.log(gridInstance.widgetList[widgetID])
+
+        
+
+        document.getElementById(gridInstance.gridID).appendChild(gridInstance.DivData);
+        document.getElementById('widgetsStyle').innerHTML = gridInstance.CssData.innerHTML;
+
+        gridInstance.hidden = false;
+        //document.getElementById(targetElementID).appendChild(elements.div);
     }
 
     static checkFixInputSize(instance, widgetID){

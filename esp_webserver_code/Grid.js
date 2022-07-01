@@ -47,8 +47,13 @@ export var ManageGrid = {
 
                 //console.log('grid-template-columns: repeat(' + oldWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')')
                 //.log('grid-template-columns: repeat(' + newWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')')
-                ManageDiv.existing.css.replaceCode('grid-template-columns: repeat(' + oldWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', 'grid-template-columns: repeat(' + newWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', instance.targetCssID);
-                ManageDiv.existing.css.replaceCode('grid-template-rows: repeat('+ oldHeight +',' + instance.gridSegmentHeight + instance.sizeUnit + ')','grid-template-rows: repeat('+ newHeight +',' + instance.gridSegmentHeight + instance.sizeUnit + ')', instance.targetCssID);
+                ManageDiv.existing.css.replaceCode('grid-template-columns: repeat(' + oldWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', 'grid-template-columns: repeat(' + newWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', instance.CssData);
+                ManageDiv.existing.css.replaceCode('grid-template-rows: repeat('+ oldHeight +',' + instance.gridSegmentHeight + instance.sizeUnit + ')','grid-template-rows: repeat('+ newHeight +',' + instance.gridSegmentHeight + instance.sizeUnit + ')', instance.CssData);
+
+                if(instance.hidden == false){
+                    
+                }
+                //loop through instance, and replace 
             },
 
         },
@@ -123,7 +128,7 @@ export var ManageGrid = {
 
     create: {
 
-        positionClass: function(instance, targetElement, targetCssID, width, height, TopLeftPosition){
+        positionClass: function(instance, targetElements, targetCssID, width, height, TopLeftPosition){
             if(width === undefined){return undefined;}
             if(height === undefined){return undefined;}
             if(TopLeftPosition.X === undefined){return undefined;}
@@ -141,15 +146,15 @@ export var ManageGrid = {
 
         
 
-            ManageDiv.passed.css.addCode(targetElement, 'height: ' + (heightPx + topGapPx) + instance.sizeUnit, targetCssID);
-            ManageDiv.passed.css.addCode(targetElement, 'width: ' + (widthPx + leftGapPx) + instance.sizeUnit, targetCssID);
-            ManageDiv.passed.css.addCode(targetElement, 'grid-row-start: ' + ymin, targetCssID);
-            ManageDiv.passed.css.addCode(targetElement, 'grid-row-end: ' + ymax, targetCssID);
-            ManageDiv.passed.css.addCode(targetElement, 'grid-column-start: ' + xmin, targetCssID);
-            ManageDiv.passed.css.addCode(targetElement, 'grid-column-end: ' + xmax, targetCssID);
-            ManageDiv.passed.css.addCode(targetElement, 'transition: 1s', targetCssID);
+            ManageDiv.passed.css.addCode(targetElements.div, 'height: ' + (heightPx + topGapPx) + instance.sizeUnit, targetElements.css);
+            ManageDiv.passed.css.addCode(targetElements.div, 'width: ' + (widthPx + leftGapPx) + instance.sizeUnit, targetElements.css);
+            ManageDiv.passed.css.addCode(targetElements.div, 'grid-row-start: ' + ymin, targetElements.css);
+            ManageDiv.passed.css.addCode(targetElements.div, 'grid-row-end: ' + ymax, targetElements.css);
+            ManageDiv.passed.css.addCode(targetElements.div, 'grid-column-start: ' + xmin, targetElements.css);
+            ManageDiv.passed.css.addCode(targetElements.div, 'grid-column-end: ' + xmax, targetElements.css);
+            ManageDiv.passed.css.addCode(targetElements.div, 'transition: 1s', targetElements.css);
         
-            return targetElement;
+            return targetElements;
         }, 
 
         css: {
