@@ -30,7 +30,7 @@
     "widgetCreator": {
         "name": "widgetCreator",
         "sizeLimits": {"MinWidth": 6, "MaxWidth": 6, "MinHeight": 5, "MaxHeight": 5},
-        "widgetStructure": "let data = [{}]; data[0].div = document.createElement('div'); data[0].css = document.createElement('style'); $/$addCssCode$/$(data[0].div, 'background-color: white', data[0].css); $/$addCssCode$/$(data[0].div, 'border-radius: 10px', data[0].css); $/$subGrid$/$(data[0].div); return data[0];",
+        "widgetStructure": "let  data = []; data[0] = document.createElement('div'); $/$addCssCode$/$(data[0], 'background-color: white'); $/$addCssCode$/$(data[0], 'border-radius: 10px'); $/$subGrid$/$(data[0]); return data[0];",
 
         "shortenedValues": [],
         "jsSetup": "",

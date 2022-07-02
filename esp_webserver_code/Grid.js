@@ -1,5 +1,4 @@
 import {ManageCss, ManageWidget} from "./ManageCss.js";
-import {ManageDiv} from "./ManageDiv.js";
 
 import {addLineOfcode, removeLineOfcode, replaceLineOfCode} from "./ManageCode.js";
 import { WidgetsOnGrid } from "./WidgetsOnGrid.js";
@@ -15,6 +14,8 @@ export var ManageGrid = {
 
 
             let gridDiv = instance.DivData
+
+            gridDiv.id = instance.gridID;
 
             gridDiv = addLineOfcode(gridDiv, 'margin: 0 auto');
             gridDiv = addLineOfcode(gridDiv, 'top: 50%');
@@ -123,13 +124,21 @@ export var ManageGrid = {
 
             let unit = instance.sizeUnit;
 
-            ManageDiv.existing.div.appendAttribute(instance.gridID, 'style', 'width: ' + widthPx + unit +'; height: ' + heightPx + unit + ';')
+            if(instance.hidden == true){
+                instance.DivData.setAttribute('style', 'width: ' + widthPx + unit +'; height: ' + heightPx + unit + ';');
+            }
+
+            if(instance.hidden == false){
+                console.log('todo');
+                instance.DivData.setAttribute('style', 'width: ' + widthPx + unit +'; height: ' + heightPx + unit + ';');
+            }
+            
         },
     },
 
     create: {
 
-        positionClass: function(instance, targetElements, targetCssID, width, height, TopLeftPosition){
+        positionClass: function(instance, targetDiv, width, height, TopLeftPosition){
             if(width === undefined){return undefined;}
             if(height === undefined){return undefined;}
             if(TopLeftPosition.X === undefined){return undefined;}
@@ -145,17 +154,19 @@ export var ManageGrid = {
             let leftGapPx = instance.gridSegmentLeftGap * (width-1);
             let topGapPx = instance.gridSegmentTopGap * (height-1);
 
+            
         
 
-            ManageDiv.passed.css.addCode(targetElements.div, 'height: ' + (heightPx + topGapPx) + instance.sizeUnit, targetElements.css);
-            ManageDiv.passed.css.addCode(targetElements.div, 'width: ' + (widthPx + leftGapPx) + instance.sizeUnit, targetElements.css);
-            ManageDiv.passed.css.addCode(targetElements.div, 'grid-row-start: ' + ymin, targetElements.css);
-            ManageDiv.passed.css.addCode(targetElements.div, 'grid-row-end: ' + ymax, targetElements.css);
-            ManageDiv.passed.css.addCode(targetElements.div, 'grid-column-start: ' + xmin, targetElements.css);
-            ManageDiv.passed.css.addCode(targetElements.div, 'grid-column-end: ' + xmax, targetElements.css);
-            ManageDiv.passed.css.addCode(targetElements.div, 'transition: 1s', targetElements.css);
+            targetDiv = addLineOfcode(targetDiv, 'height: ' + (heightPx + topGapPx) + instance.sizeUnit);
+            targetDiv = addLineOfcode(targetDiv, 'width: ' + (widthPx + leftGapPx) + instance.sizeUnit);
+            targetDiv = addLineOfcode(targetDiv, 'grid-row-start: ' + ymin);
+            targetDiv = addLineOfcode(targetDiv, 'grid-row-end: ' + ymax);
+            targetDiv = addLineOfcode(targetDiv, 'grid-column-start: ' + xmin);
+            targetDiv = addLineOfcode(targetDiv, 'grid-column-end: ' + xmax);
+            targetDiv = addLineOfcode(targetDiv, 'transition: 1s');
+            
         
-            return targetElements;
+            return targetDiv;
         }, 
 
         css: {
