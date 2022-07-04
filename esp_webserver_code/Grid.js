@@ -2,6 +2,7 @@ import {ManageCss, ManageWidget} from "./ManageCss.js";
 
 import {addLineOfcode, removeLineOfcode, replaceLineOfCode} from "./ManageCode.js";
 import { WidgetsOnGrid } from "./WidgetsOnGrid.js";
+import { parseWidgetCode } from "./WidgetJsonParser.js";
 
 export var ManageGrid = {
     main: {
@@ -115,23 +116,45 @@ export var ManageGrid = {
         },
 
         updateSizes: function(instance){
-            instance.gridHeight = ManageGrid.main.get.height(instance);
-            instance.gridWidth = ManageGrid.main.get.width(instance);
+            console.log('todo dont read screen, read parent 4head');
+            let heightPx;
+            let widthPx;
 
+            if(instance.hidden){
+                instance.gridHeight = 0;
+                instance.gridWidth = 0;
 
-            let heightPx = ManageGrid.main.get.heightPx(instance)
-            let widthPx = ManageGrid.main.get.widthPx(instance)
+                heightPx = 0;
+                widthPx = 0;
+            }else{
+
+                if(instance.family.parentGrid == undefined){
+                    instance.gridHeight = ManageGrid.main.get.height(instance);
+                    instance.gridWidth = ManageGrid.main.get.width(instance);
+        
+                    heightPx = ManageGrid.main.get.heightPx(instance)
+                    widthPx = ManageGrid.main.get.widthPx(instance)
+                }else{
+                    let parentInstance = WidgetsOnGrid.assignInstanceNumber(instance.family.parentGrid);
+                    parentInstance = WidgetsOnGrid.grid.instances[parentInstance];
+
+                    let parentWidget = WidgetsOnGrid.getAssignedWidgetNumber(parentInstance, instance.family.childOf);
+                    parentWidget = parentInstance.widgetList[parentWidget];
+                    console.log(parentWidget.size.height);
+                    
+                    instance.gridHeight = parentWidget.size.height;
+                    instance.gridWidth = parentWidget.size.width;
+                    
+                    heightPx = 0;
+                    widthPx = 0;
+                }
+
+            }
+
 
             let unit = instance.sizeUnit;
 
-            if(instance.hidden == true){
-                instance.DivData.setAttribute('style', 'width: ' + widthPx + unit +'; height: ' + heightPx + unit + ';');
-            }
-
-            if(instance.hidden == false){
-                console.log('todo');
-                instance.DivData.setAttribute('style', 'width: ' + widthPx + unit +'; height: ' + heightPx + unit + ';');
-            }
+            instance.DivData.setAttribute('style', 'width: ' + widthPx + unit +'; height: ' + heightPx + unit + ';');
             
         },
     },
@@ -334,6 +357,8 @@ export var ManageGrid = {
                 i++;
             }
             cursorPointer.Y = i;
+
+            //console.log(cursorPointer.X + ':' + cursorPointer.Y)
 
             if(cursorPointer.X != -1 && cursorPointer.Y != -1){instance.lastKnownPointerPosition = cursorPointer;} 
         }

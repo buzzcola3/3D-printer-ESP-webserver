@@ -1,9 +1,10 @@
 import {tools} from "./widgetFunctions.js";
 
 export class parseWidgetCode{
-    constructor(widgetRawJson, gridInstance){
+    constructor(widgetRawJson, widgetID, gridInstance){
 
-        console.log(gridInstance);
+        console.log(widgetID);
+        console.log('todo use widgetID to modify target widget')
         let gridDivID = gridInstance.targetDivID;
 
         
@@ -30,23 +31,23 @@ export class parseWidgetCode{
         divHTML = parseWidgetCode.replaceShorts(divHTML, shortenedValues);
         this.divHTML = divHTML;
 
-        jsSetup = parseWidgetCode.replaceFunctions(jsSetup, gridDivID);
+        jsSetup = parseWidgetCode.replaceFunctions(jsSetup, gridDivID, widgetID);
         jsSetup = parseWidgetCode.replaceShorts(jsSetup, shortenedValues)
         jsSetup = new Function('', jsSetup);
         this.jsSetup = jsSetup;
 
-        jsFunction = parseWidgetCode.replaceFunctions(jsFunction, gridDivID);
+        jsFunction = parseWidgetCode.replaceFunctions(jsFunction, gridDivID, widgetID);
         jsFunction = parseWidgetCode.replaceShorts(jsFunction, shortenedValues)
         jsFunction = new Function('', jsFunction);
         this.jsFunction = jsFunction;
 
-        jsUnsetup = parseWidgetCode.replaceFunctions(jsUnsetup, gridDivID); 
+        jsUnsetup = parseWidgetCode.replaceFunctions(jsUnsetup, gridDivID, widgetID); 
         jsUnsetup = parseWidgetCode.replaceShorts(jsUnsetup, shortenedValues)
         jsUnsetup = new Function('', jsUnsetup);
         this.jsUnsetup = jsUnsetup;
 
-        widgetStructure = parseWidgetCode.replaceShorts(widgetStructure, shortenedValues);
-        widgetStructure = parseWidgetCode.replaceFunctions(widgetStructure, gridDivID);
+        widgetStructure = parseWidgetCode.replaceShorts(widgetStructure, shortenedValues, widgetID);
+        widgetStructure = parseWidgetCode.replaceFunctions(widgetStructure, gridDivID, widgetID);
         widgetStructure = new Function('', widgetStructure);
         this.widgetStructure = widgetStructure;
 
@@ -65,7 +66,7 @@ export class parseWidgetCode{
         return{name, sizeLimits, divHTML, jsSetup, jsFunction, jsUnsetup, widgetStructure};
     }
 
-    static replaceFunctions(rawString, gridDivID){
+    static replaceFunctions(rawString, gridDivID, widgetID){
 
         while(rawString.includes('$/$replaceBackgroundImage$/$')){
             let toBeReplaced = '$/$replaceBackgroundImage$/$'
@@ -112,7 +113,9 @@ export class parseWidgetCode{
             startOfVar = startOfVar + toBeReplaced.length;
 
             rawString = parseWidgetCode.getShortFunctionVars(rawString, startOfVar);
-            this.currentFunctionVars.push("'" + gridDivID + "'");
+            this.currentFunctionVars.unshift("'" + widgetID + "'");
+            this.currentFunctionVars.unshift("'" + gridDivID + "'");
+            
 
             rawString = rawString.replace(toBeReplaced, 'tools.createSubGrid' + '(' + this.curFuncVarsToString() + ')');
             this.currentFunctionVars = undefined;
@@ -164,6 +167,9 @@ export class parseWidgetCode{
     static curFuncVarsToString(){
         let curFuncVars = this.currentFunctionVars;
         let varString = '';
+
+        if(curFuncVars[0] == ''){curFuncVars.shift()}
+        console.log(curFuncVars);
 
         let i = 0;
         while(1){
