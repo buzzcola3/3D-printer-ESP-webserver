@@ -56,6 +56,8 @@ export class WidgetStructure{
 
 
     static addressToWidgetStructure(address = []){
+        if(address[0] === undefined){return undefined};
+
         let structString = '';
 
         structString = 'widgetTree[' + address[0] + ']'
@@ -72,11 +74,21 @@ export class WidgetStructure{
         return structString;
     }
 
-    static addCode(address, code){
-        //addLineOfcode
+    static removeCode(address, code){
         let structureRef = WidgetStructure.addressToWidgetStructure(address);
-        console.log(structureRef)
-        console.log('making child for: ' + address);
+        console.log('adding code to: ' + address);
+
+        let f = 'removeLineOfcode(' + structureRef + '.divCode,"' + code + '"); return {widgetTree: widgetTree};'
+        f = new Function('widgetTree', 'addLineOfcode', f);
+
+        f(WidgetStructure.widgetTree, removeLineOfcode);
+        //let funOut = f(WidgetStructure.widgetTree, addLineOfcode);
+        //WidgetStructure.widgetTree = funOut.widgetTree
+    }
+
+    static addCode(address, code){
+        let structureRef = WidgetStructure.addressToWidgetStructure(address);
+        //console.log('adding code to: ' + address);
 
         let f = 'addLineOfcode(' + structureRef + '.divCode,"' + code + '"); return {widgetTree: widgetTree};'
         f = new Function('widgetTree', 'addLineOfcode', f);
@@ -87,13 +99,10 @@ export class WidgetStructure{
     }
     
     createChild(parentAddress = [], childNode = document.createElement('div')){ //<-- [0,0]
-        console.log(WidgetStructure.widgetTree);
-
         console.log('making child for: ' + parentAddress);
 
 
         let structureRef = WidgetStructure.addressToWidgetStructure(parentAddress);
-        console.log(structureRef)
         console.log('making child for: ' + parentAddress);
 
         let f = 'let i = 0; while(1){ if(' + structureRef + '.children[i] === undefined){break;}; i++;}' + structureRef + '.children[i] = emptyElement; return {widgetTree: widgetTree, address: i};'
@@ -108,9 +117,7 @@ export class WidgetStructure{
         }
 
         let funOut = f(WidgetStructure.widgetTree, emptyElement);
-        //WidgetStructure.widgetTree = funOut.widgetTree
-        console.log(funOut.address)
-        
+        //WidgetStructure.widgetTree = funOut.widgetTree  
         
         let childAddress = parentAddress.concat([])
 
@@ -119,13 +126,129 @@ export class WidgetStructure{
         return childAddress;
     }
 
-    appendChild(){}
+    static getAddressesOfChildren(parentAddress){
+        let structureRef = WidgetStructure.addressToWidgetStructure(parentAddress);
+        if(structureRef === undefined){return undefined};
+        console.warn(structureRef)
+        //console.log('getting children of: ' + parentAddress);
 
-    hide(){}
+        let f = 'let children = ' + structureRef + '.children; let childrenList = []; let i = 0; while(1){if(children[i] === undefined){break;} childrenList.push(i); i++;} return childrenList;'
+        f = new Function('widgetTree', f);
+
+        //console.log(f)
+        let childrenArr = f(WidgetStructure.widgetTree);
+        if(childrenArr[0] == undefined){return undefined}
+
+        let i = 0;
+        while(1){
+            if(childrenArr[i] === undefined || childrenArr === undefined){break;}
+            childrenArr[i] = parentAddress.concat(childrenArr[i]);
+            i++;
+        }
+
+        return childrenArr;
+    }
+
+    static getChildrenArray(parentAddress = []){ //returns an array of children from the most nested to the least nested
+        parentAddress = [0]
+        //first check [0,0,0,0]
+        // then check [0,0,0,1]
+        // then check [0,0,0,2]
+        // then check [0,0,1,0]
+        // then check [0,0,1,1]
+        // then check [0,3,0,0]
+        console.log(this.widgetTree);
+        let searchAddress = parentAddress.concat([]);
+
+        let arrOut = [];
+        
+
+        let movingForward = true;
+
+        while(1){
+
+            while(movingForward){
+                if(this.hasChildren(searchAddress)){searchAddress.push(0)}
+                else{
+                    if(this.hasNextSibling(searchAddress)){let nextSiblingNumber = (searchAddress.slice(-1)[0])+1; searchAddress.pop(); searchAddress.push(nextSiblingNumber)}
+                    if(this.hasNextSibling(searchAddress) == false){movingForward = false; arrOut.push(searchAddress.concat([])); console.log(searchAddress)}
+                }
+
+            }
+
+            while(movingForward == false){
+                if(parentAddress.toString() == searchAddress.toString()){break;}
+
+                if(this.hasNextSibling(searchAddress) == false){searchAddress.pop();}
+                if(this.hasNextSibling(searchAddress)){let nextSiblingNumber = (searchAddress.slice(-1)[0])+1; searchAddress.pop(); searchAddress.push(nextSiblingNumber); movingForward = true;}
+            }
+
+            if(parentAddress.toString() == searchAddress.toString()){break;}
+
+
+            //if(this.hasChildren(searchAddress) == false){searchAddress.pop(); break;}
+            //searchAddress.push(0)
+        }
+        console.log(arrOut);
+
+        return arrOut;
+        
+    }
+
+    static ifExists(address){
+        if(address.length <= 1){return false}
+        let parentAddr = address.concat([]);
+        parentAddr.pop();
+
+        let children = this.getAddressesOfChildren(parentAddr)
+        let length = children.length;
+        let i = 0;
+        while(1){
+            if(i >= length){break;}
+
+            if(children[i].toString() === address.toString()){return true}
+            i++;
+        }
+
+        return false;
+
+    }
+
+    static hasChildren(address){
+        if(address === undefined){return false}
+        if(this.getAddressesOfChildren(address) === undefined){return false}
+        return true;
+    }
+
+    static hasNextSibling(address){
+        if(address === undefined){return false}
+        if(address.length <= 1){return false}
+        let parentAdd = address.concat([]);
+
+        let currentSiblingNumber = parentAdd.slice(-1)[0]
+    
+        parentAdd.pop();
+        parentAdd.push(currentSiblingNumber+1);
+
+        if(this.ifExists(parentAdd)){return true}
+        
+        return false;
+    }
+
+
+//    static getHideFunction(address){ //returns a function that will hide element of the given address and it's children from DOM, 
+//        let structureRef = WidgetStructure.addressToWidgetStructure(address);
+//        console.log('creating hide function for: ' + address);
+//
+//        let f = 'addLineOfcode(' + structureRef + '.divCode,"' + code + '");'
+//        f = new Function('widgetTree', 'addLineOfcode', f);
+//
+//        return;
+//    }
 
     hideChildren(){}
 
-    show(){}
+    getShowFunction(){}
 
     showChildren(){}
 }

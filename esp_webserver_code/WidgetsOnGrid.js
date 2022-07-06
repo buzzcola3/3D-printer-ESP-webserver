@@ -8,19 +8,24 @@ let test = new WidgetStructure('mainDiv1', "widgetCreator")
 let parentWidget = WidgetStructure.getLastest()
 console.log(parentWidget)
 
-let child = test.createChild(parentWidget);
-console.log(child)
+let child1 = test.createChild(parentWidget);
+console.log(child1)
 console.log(parentWidget)
 
-let child2 = test.createChild(parentWidget);
-console.log(child2)
+let childofchild1 = test.createChild(child1);
+console.log(childofchild1)
 console.log(parentWidget)
 
-let childofchild2 = test.createChild(child2);
-console.log(childofchild2)
+let childofchildofchild1 = test.createChild(childofchild1);
+console.log(childofchildofchild1)
 console.log(parentWidget)
 
-WidgetStructure.addCode(child2, 'test');
+let childofchild1Sibling = test.createChild(child1);
+console.log(childofchild1)
+console.log(parentWidget)
+
+WidgetStructure.addCode(childofchildofchild1, 'test');
+WidgetStructure.getChildrenArray(parentWidget);
 
 
 
