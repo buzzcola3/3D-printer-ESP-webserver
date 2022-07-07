@@ -37,6 +37,7 @@ export class WidgetStructure{
         let newBranch = {
             children: [],
             ID: parentID + '_' + widgetName,
+            addressID: freeBranch,
             divCode: document.createElement('div')
         }
 
@@ -105,23 +106,19 @@ export class WidgetStructure{
         let structureRef = WidgetStructure.addressToWidgetStructure(parentAddress);
         console.log('making child for: ' + parentAddress);
 
-        let f = 'let i = 0; while(1){ if(' + structureRef + '.children[i] === undefined){break;}; i++;}' + structureRef + '.children[i] = emptyElement; return {widgetTree: widgetTree, address: i};'
-        f = new Function('widgetTree', 'emptyElement', f);
+        let f = 'let i = 0; while(1){ if(' + structureRef + '.children[i] === undefined){break;}; i++;}' + structureRef + '.children[i] = emptyElement; let childAddress = parentAddress.concat([]);  childAddress.push(i);' + structureRef + '.children[i].addressID = childAddress; return {widgetTree: widgetTree, address: childAddress};'
+        f = new Function('widgetTree', 'parentAddress', 'emptyElement', f);
 
-        //let f = structureRef + '.children.push(emptyElement);' + 'return widgetTree;' ;
-        //f = new Function('widgetTree', 'emptyElement', f)
 
         let emptyElement = {
             children: [],
+            addressID: undefined,
             divCode: childNode
         }
 
-        let funOut = f(WidgetStructure.widgetTree, emptyElement);
-        //WidgetStructure.widgetTree = funOut.widgetTree  
+        let funOut = f(WidgetStructure.widgetTree, parentAddress, emptyElement);
         
-        let childAddress = parentAddress.concat([])
-
-        childAddress.push(funOut.address);
+        let childAddress = funOut.address
         
         return childAddress;
     }
@@ -149,7 +146,7 @@ export class WidgetStructure{
         return childrenArr;
     }
 
-    static getChildrenArray(parentAddress = []){ //returns an array of children from the most nested to the least nested
+    static getLeafArray(parentAddress = []){ //returns an array of children from the most nested to the least nested
         parentAddress = [0]
         //first check [0,0,0,0]
         // then check [0,0,0,1]
@@ -160,7 +157,9 @@ export class WidgetStructure{
         console.log(this.widgetTree);
         let searchAddress = parentAddress.concat([]);
 
-        let arrOut = [];
+        //let arrOut = [];
+        let setOut = new Set;
+        let treeLeafsOnly = [];
         
 
         let movingForward = true;
@@ -168,10 +167,19 @@ export class WidgetStructure{
         while(1){
 
             while(movingForward){
-                if(this.hasChildren(searchAddress)){searchAddress.push(0)}
+                if(this.hasChildren(searchAddress)){searchAddress.push(0); setOut.add(searchAddress.toString())}
                 else{
-                    if(this.hasNextSibling(searchAddress)){let nextSiblingNumber = (searchAddress.slice(-1)[0])+1; searchAddress.pop(); searchAddress.push(nextSiblingNumber)}
-                    if(this.hasNextSibling(searchAddress) == false){movingForward = false; arrOut.push(searchAddress.concat([])); console.log(searchAddress)}
+                    if(this.hasNextSibling(searchAddress)){
+                        let nextSiblingNumber = (searchAddress.slice(-1)[0])+1;
+                        searchAddress.pop();
+                        searchAddress.push(nextSiblingNumber)
+                    }
+                    
+                    if(this.hasNextSibling(searchAddress) == false){
+                        movingForward = false;
+                        setOut.add(searchAddress.toString());
+                        treeLeafsOnly.push(searchAddress.concat([]));
+                    }
                 }
 
             }
@@ -189,9 +197,12 @@ export class WidgetStructure{
             //if(this.hasChildren(searchAddress) == false){searchAddress.pop(); break;}
             //searchAddress.push(0)
         }
-        console.log(arrOut);
 
-        return arrOut;
+        let arrOut = [];
+
+        setOut.forEach((val) => {arrOut.push(val.split(','))});
+
+        return treeLeafsOnly;
         
     }
 
@@ -236,17 +247,23 @@ export class WidgetStructure{
     }
 
 
-//    static getHideFunction(address){ //returns a function that will hide element of the given address and it's children from DOM, 
-//        let structureRef = WidgetStructure.addressToWidgetStructure(address);
-//        console.log('creating hide function for: ' + address);
-//
-//        let f = 'addLineOfcode(' + structureRef + '.divCode,"' + code + '");'
-//        f = new Function('widgetTree', 'addLineOfcode', f);
-//
-//        return;
-//    }
+    static getHideFunction(address){ //returns a function that will hide element of the given address and it's children from DOM, 
 
-    hideChildren(){}
+        let leafs = WidgetStructure.getLeafArray(address);
+
+        console.log(this.widgetTree)
+        leafs.forEach((leaf) => {console.log(leaf)})
+
+
+
+        //f = 
+        //let f = new Function(f)
+
+        return;
+    }
+
+    hideWidget(address){
+    }
 
     getShowFunction(){}
 

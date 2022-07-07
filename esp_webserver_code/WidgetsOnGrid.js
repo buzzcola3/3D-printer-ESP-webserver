@@ -25,7 +25,7 @@ console.log(childofchild1)
 console.log(parentWidget)
 
 WidgetStructure.addCode(childofchildofchild1, 'test');
-WidgetStructure.getChildrenArray(parentWidget);
+WidgetStructure.getHideFunction(parentWidget);
 
 
 
