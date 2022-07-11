@@ -8,23 +8,37 @@ let test = new WidgetStructure('mainDiv1', "widgetCreator")
 let parentWidget = WidgetStructure.getLastest()
 console.log(parentWidget)
 
-let child1 = test.createChild(parentWidget);
-console.log(child1)
+let _00 = test.createChild(parentWidget);
+console.log(_00)
 console.log(parentWidget)
 
-let childofchild1 = test.createChild(child1);
-console.log(childofchild1)
+let _000 = test.createChild(_00);
+console.log(_000)
 console.log(parentWidget)
 
-let childofchildofchild1 = test.createChild(childofchild1);
-console.log(childofchildofchild1)
+let _001 = test.createChild(_00);
+console.log(_001)
 console.log(parentWidget)
 
-let childofchild1Sibling = test.createChild(child1);
-console.log(childofchild1)
+let _002 = test.createChild(_00);
+console.log(_002)
 console.log(parentWidget)
 
-WidgetStructure.addCode(childofchildofchild1, 'test');
+let _0020 = test.createChild(_002);
+console.log(_0020)
+console.log(parentWidget)
+
+let _0000 = test.createChild(_000);
+console.log(_0000)
+console.log(parentWidget)
+
+let _0001 = test.createChild(_000);
+console.log(_0001)
+console.log(parentWidget)
+
+
+
+WidgetStructure.addCode(_0020, 'test');
 WidgetStructure.getHideFunction(parentWidget);
 
 
