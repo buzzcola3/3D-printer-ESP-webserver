@@ -39,7 +39,7 @@ console.log(parentWidget)
 
 
 WidgetStructure.addCode(_0020, 'test');
-WidgetStructure.getHideFunction(parentWidget);
+WidgetStructure.getAddressObj(_002).hide();
 
 
 

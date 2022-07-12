@@ -39,6 +39,7 @@ export class WidgetStructure{
             ID: parentID + '_' + widgetName,
             addressID: freeBranch,
             hidden: false,
+            hide: WidgetStructure.getHideFunction([freeBranch]),
             divCode: document.createElement('div')
         }
 
@@ -107,7 +108,7 @@ export class WidgetStructure{
         let structureRef = WidgetStructure.addressToWidgetStructure(parentAddress);
         console.log('making child for: ' + parentAddress);
 
-        let f = 'let i = 0; while(1){ if(' + structureRef + '.children[i] === undefined){break;}; i++;}' + structureRef + '.children[i] = emptyElement; let childAddress = parentAddress.concat([]);  childAddress.push(i);' + structureRef + '.children[i].addressID = childAddress.toString(); return {widgetTree: widgetTree, address: childAddress};'
+        let f = 'let i = 0; while(1){ if(' + structureRef + '.children[i] === undefined){break;}; i++;}' + structureRef + '.children[i] = emptyElement; let childAddress = parentAddress.concat([]);  childAddress.push(i); return {widgetTree: widgetTree, address: childAddress};'
         f = new Function('widgetTree', 'parentAddress', 'emptyElement', f);
 
 
@@ -115,12 +116,17 @@ export class WidgetStructure{
             children: [],
             addressID: undefined,
             hidden: false,
+            display: undefined,
+            hide: undefined,
             divCode: childNode
         }
 
         let funOut = f(WidgetStructure.widgetTree, parentAddress, emptyElement);
-        
         let childAddress = funOut.address
+
+        WidgetStructure.getAddressObj(childAddress).hide = WidgetStructure.getHideFunction(childAddress);
+        WidgetStructure.getAddressObj(childAddress).display = WidgetStructure.getDisplayFunction(childAddress);
+        WidgetStructure.getAddressObj(childAddress).addressID = childAddress.toString();
         
         return childAddress;
     }
@@ -156,7 +162,7 @@ export class WidgetStructure{
         //if(this.hasChildren)
         //if(this.hasNextSibling)
 
-        if(this.hasChildren(searchAddress) == false){return;}
+        if(WidgetStructure.hasChildren(searchAddress) == false){return;}
 
 
         function getChildren(hasNextSibling, ifExists, orgSearchAddress = []){
@@ -197,7 +203,7 @@ export class WidgetStructure{
             //return children;
         }
 
-        let children = getChildren(this.hasNextSibling, this.ifExists, searchAddress)
+        let children = getChildren(WidgetStructure.hasNextSibling, WidgetStructure.ifExists, searchAddress)
 
 
         let toSearchNext = [];
@@ -208,7 +214,7 @@ export class WidgetStructure{
             let newToSearchNext = [];
 
             toSearchNext.forEach((child) => {
-                newToSearchNext = newToSearchNext.concat(getChildren(this.hasNextSibling, this.ifExists, child));
+                newToSearchNext = newToSearchNext.concat(getChildren(WidgetStructure.hasNextSibling, WidgetStructure.ifExists, child));
             })
             newToSearchNext.forEach((child) => {children.push(child)})
             toSearchNext = newToSearchNext.concat([]);
@@ -216,6 +222,7 @@ export class WidgetStructure{
             if(toSearchNext.toString() == [].toString()){break;}
         }
         console.log(children)
+        return(children);
     }
 
     //status Functions
@@ -265,17 +272,38 @@ export class WidgetStructure{
 
     static getHideFunction(address){ //returns a function that will hide element of the given address and it's children from DOM, 
 
-        let children = WidgetStructure.getChildren(address);
+        //let address = [' + address + '];
+        //let children = getChildren(address);
+        //children.reverse();
 
-        console.log(this.widgetTree)
-        leafs.forEach((leaf) => {WidgetStructure.hideLeaf(leaf);})
+        //children.forEach((child) => {getAddressObj(child).hidden = true});
+        //getAddressObj(address).hidden = true;
 
+        window.getChildren = WidgetStructure.getChildren;
+        window.getAddressObj = WidgetStructure.getAddressObj;
 
+        let f = 'let address = [' + address + ']; let children = getChildren(address); children.reverse(); children.forEach((child) => {getAddressObj(child).hidden = true}); getAddressObj(address).hidden = true;'
+        f = new Function(f)
 
-        //f = 
-        //let f = new Function(f)
+        return f;
+    }
 
-        return;
+    static getDisplayFunction(address){ //returns a function that will hide element of the given address and it's children from DOM, 
+
+        //let address = [' + address + '];
+        //let children = getChildren(address);
+        //children.reverse();
+
+        //children.forEach((child) => {getAddressObj(child).hidden = true});
+        //getAddressObj(address).hidden = true;
+
+        window.getChildren = WidgetStructure.getChildren;
+        window.getAddressObj = WidgetStructure.getAddressObj;
+
+        let f = 'let address = [' + address + ']; let children = getChildren(address); children.reverse(); children.forEach((child) => {getAddressObj(child).hidden = false}); getAddressObj(address).hidden = false;'
+        f = new Function(f)
+
+        return f;
     }
 
     static getAddressObj(address){
