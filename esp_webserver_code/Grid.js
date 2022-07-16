@@ -1,20 +1,25 @@
 import {ManageCss, ManageWidget} from "./ManageCss.js";
 
 import {addLineOfcode, removeLineOfcode, replaceLineOfCode} from "./ManageCode.js";
+import { WidgetStructure } from "./widgets.js";
 import { WidgetsOnGrid } from "./WidgetsOnGrid.js";
 import { parseWidgetCode } from "./WidgetJsonParser.js";
 
 export var ManageGrid = {
     main: {
 
-        create: function(instance){
-            ManageGrid.main.updateSizes(instance);
+        getGridEl: function(instance){
+            //ManageGrid.main.updateSizes(instance);
 
             let height = instance.gridHeight;
             let width = instance.gridWidth;
 
 
-            let gridDiv = instance.DivData
+            if(height === undefined){height = 0;}
+            if(width === undefined){width = 0}
+
+
+            let gridDiv = document.createElement('div');
 
             gridDiv.id = instance.gridID;
 
@@ -37,17 +42,20 @@ export var ManageGrid = {
         update: {
             size: function(instance){
 
-                let oldHeight = instance.gridHeight
-                let oldWidth = instance.gridWidth
+                let oldHeight = instance.gridHeight;
+                let oldWidth = instance.gridWidth;
+                if(oldHeight === undefined){oldHeight = 0;}
+                if(oldWidth === undefined){oldWidth = 0}
 
                 ManageGrid.main.updateSizes(instance);
 
                 let newHeight = instance.gridHeight
                 let newWidth = instance.gridWidth
 
-                let newDivData = instance.DivData;
+                let newDivData = WidgetStructure.getAddressObj(instance.treeStructAddr).divCode;
 
                 if(oldHeight == newHeight && oldWidth == newWidth){return newDivData;}
+
 
                 newDivData = replaceLineOfCode(newDivData, 'grid-template-columns: repeat(' + oldWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')', 'grid-template-columns: repeat(' + newWidth + ',' + instance.gridSegmentWidth + instance.sizeUnit + ')');
                 newDivData = replaceLineOfCode(newDivData, 'grid-template-rows: repeat('+ oldHeight +',' + instance.gridSegmentHeight + instance.sizeUnit + ')','grid-template-rows: repeat('+ newHeight +',' + instance.gridSegmentHeight + instance.sizeUnit + ')');
@@ -116,45 +124,46 @@ export var ManageGrid = {
         },
 
         updateSizes: function(instance){
-            console.log('todo dont read screen, read parent 4head');
             let heightPx;
             let widthPx;
 
-            if(instance.hidden){
-                instance.gridHeight = 0;
-                instance.gridWidth = 0;
+            //if(instance.hidden){
+            //    instance.gridHeight = 0;
+            //    instance.gridWidth = 0;
+//
+            //    heightPx = 0;
+            //    widthPx = 0;
+            //}else{
 
-                heightPx = 0;
-                widthPx = 0;
-            }else{
-
-                if(instance.family.parentGrid == undefined){
+                //if(instance.family.parentGrid == undefined){
                     instance.gridHeight = ManageGrid.main.get.height(instance);
                     instance.gridWidth = ManageGrid.main.get.width(instance);
         
                     heightPx = ManageGrid.main.get.heightPx(instance)
                     widthPx = ManageGrid.main.get.widthPx(instance)
-                }else{
-                    let parentInstance = WidgetsOnGrid.assignInstanceNumber(instance.family.parentGrid);
-                    parentInstance = WidgetsOnGrid.grid.instances[parentInstance];
+                //}else{
+                //    let parentInstance = WidgetsOnGrid.assignInstanceNumber(instance.family.parentGrid);
+                //    parentInstance = WidgetsOnGrid.grid.instances[parentInstance];
+//
+                //    let parentWidget = WidgetsOnGrid.getAssignedWidgetNumber(parentInstance, instance.family.childOf);
+                //    parentWidget = parentInstance.widgetList[parentWidget];
+                //    console.log(parentWidget.size.height);
+                //    
+                //    instance.gridHeight = parentWidget.size.height;
+                //    instance.gridWidth = parentWidget.size.width;
+                //    
+                //    heightPx = 0;
+                //    widthPx = 0;
+                //}
 
-                    let parentWidget = WidgetsOnGrid.getAssignedWidgetNumber(parentInstance, instance.family.childOf);
-                    parentWidget = parentInstance.widgetList[parentWidget];
-                    console.log(parentWidget.size.height);
-                    
-                    instance.gridHeight = parentWidget.size.height;
-                    instance.gridWidth = parentWidget.size.width;
-                    
-                    heightPx = 0;
-                    widthPx = 0;
-                }
+            //}
 
-            }
 
+            let address = instance.treeStructAddr;
+            let targetDiv = WidgetStructure.getAddressObj(address).divCode;
 
             let unit = instance.sizeUnit;
-
-            instance.DivData.setAttribute('style', 'width: ' + widthPx + unit +'; height: ' + heightPx + unit + ';');
+            targetDiv.setAttribute('style', 'width: ' + widthPx + unit +'; height: ' + heightPx + unit + ';');
             
         },
     },
