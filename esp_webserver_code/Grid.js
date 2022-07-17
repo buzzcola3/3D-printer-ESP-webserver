@@ -170,27 +170,27 @@ export var ManageGrid = {
 
     create: {
 
-        positionClass: function(instance, targetDiv, width, height, TopLeftPosition){
-            if(width === undefined){return undefined;}
-            if(height === undefined){return undefined;}
-            if(TopLeftPosition.X === undefined){return undefined;}
-            if(TopLeftPosition.Y === undefined){return undefined;}
+        positionClass: function(sizesByPixel, width, height, TopLeftPosition, targetDiv = document.createElement('div')){
+            if(width === undefined){console.warn('No width provided'); return undefined;}
+            if(height === undefined){console.warn('No height provided'); return undefined;}
+            if(TopLeftPosition.X === undefined){console.warn('No X provided'); return undefined;}
+            if(TopLeftPosition.Y === undefined){console.warn('No Y provided'); return undefined;}
         
             let xmin = TopLeftPosition.X;
             let xmax = xmin + width;
             let ymin = TopLeftPosition.Y;
             let ymax = ymin + height;
 
-            let widthPx = instance.gridSegmentWidth * width;
-            let heightPx = instance.gridSegmentHeight * height;
-            let leftGapPx = instance.gridSegmentLeftGap * (width-1);
-            let topGapPx = instance.gridSegmentTopGap * (height-1);
+            let widthPx = sizesByPixel.gridSegmentWidth * width;
+            let heightPx = sizesByPixel.gridSegmentHeight * height;
+            let leftGapPx = sizesByPixel.gridSegmentLeftGap * (width-1);
+            let topGapPx = sizesByPixel.gridSegmentTopGap * (height-1);
 
             
         
 
-            targetDiv = addLineOfcode(targetDiv, 'height: ' + (heightPx + topGapPx) + instance.sizeUnit);
-            targetDiv = addLineOfcode(targetDiv, 'width: ' + (widthPx + leftGapPx) + instance.sizeUnit);
+            targetDiv = addLineOfcode(targetDiv, 'height: ' + (heightPx + topGapPx) + sizesByPixel.sizeUnit);
+            targetDiv = addLineOfcode(targetDiv, 'width: ' + (widthPx + leftGapPx) + sizesByPixel.sizeUnit);
             targetDiv = addLineOfcode(targetDiv, 'grid-row-start: ' + ymin);
             targetDiv = addLineOfcode(targetDiv, 'grid-row-end: ' + ymax);
             targetDiv = addLineOfcode(targetDiv, 'grid-column-start: ' + xmin);

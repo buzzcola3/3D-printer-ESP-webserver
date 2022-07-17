@@ -33,14 +33,13 @@ export class WidgetStructure{
         }
         
 
-
         let newBranch = {
             display: undefined,
             hide: undefined,
             children: [],
             ID: parentID + '_' + widgetName,
             parentID: parentID,
-            addressID: freeBranch,
+            addressID: 'WidgetStructure_' + freeBranch.toString().replaceAll(',', '_'),
             hidden: true,
             hide: WidgetStructure.getHideFunction([freeBranch]),
             divCode: divCode
@@ -59,10 +58,13 @@ export class WidgetStructure{
     static widgetTree = [];
     static addressOfLastest = [];
 
-    static getLastest(){
+    static getLastestAddress(){
         return this.addressOfLastest;
     }
 
+    static getLastestObject(){
+        return this.getAddressObj(this.addressOfLastest);
+    }
 
     static addressToWidgetStructure(address = []){
         if(address[0] === undefined){return undefined};
@@ -83,9 +85,16 @@ export class WidgetStructure{
         return structString;
     }
 
-    static removeCode(address, code){
-        let structureRef = WidgetStructure.addressToWidgetStructure(address);
-        console.log('adding code to: ' + address);
+    static removeCode(addressOrObj, code){
+        let structureRef;
+        if(typeof addressOrObj === 'object'){
+            structureRef = WidgetStructure.addressToWidgetStructure(addressOrObj.address);
+        }
+        else{
+            structureRef = WidgetStructure.addressToWidgetStructure(addressOrObj);
+        }
+        
+        console.log('removing code from: ' + addressOrObj);
 
         let f = 'removeLineOfcode(' + structureRef + '.divCode,"' + code + '"); return {widgetTree: widgetTree};'
         f = new Function('widgetTree', 'removeLineOfcode', f);
@@ -95,9 +104,15 @@ export class WidgetStructure{
         //WidgetStructure.widgetTree = funOut.widgetTree
     }
 
-    static addCode(address, code){
-        let structureRef = WidgetStructure.addressToWidgetStructure(address);
-        //console.log('adding code to: ' + address);
+    static addCode(addressOrObj, code){
+        let structureRef;
+        if(typeof addressOrObj === 'object'){
+            structureRef = WidgetStructure.addressToWidgetStructure(addressOrObj.address);
+        }
+        else{
+            structureRef = WidgetStructure.addressToWidgetStructure(addressOrObj);
+        }
+        console.log('adding code to: ' + addressOrObj);
 
         let f = 'addLineOfcode(' + structureRef + '.divCode,"' + code + '"); return {widgetTree: widgetTree};'
         f = new Function('widgetTree', 'addLineOfcode', f);
@@ -108,8 +123,6 @@ export class WidgetStructure{
     }
     
     createChild(parentAddress = [], childNode = document.createElement('div')){ //<-- [0,0]
-        console.log('making child for: ' + parentAddress);
-
 
         let structureRef = WidgetStructure.addressToWidgetStructure(parentAddress);
         console.log('making child for: ' + parentAddress);
@@ -120,8 +133,9 @@ export class WidgetStructure{
 
         let emptyElement = {
             children: [],
+            address: undefined,
             addressID: undefined,
-            hidden: false,
+            hidden: true,
             display: undefined,
             hide: undefined,
             divCode: childNode
@@ -130,11 +144,14 @@ export class WidgetStructure{
         let funOut = f(WidgetStructure.widgetTree, parentAddress, emptyElement);
         let childAddress = funOut.address
 
-        WidgetStructure.getAddressObj(childAddress).hide = WidgetStructure.getHideFunction(childAddress);
-        WidgetStructure.getAddressObj(childAddress).display = WidgetStructure.getDisplayFunction(childAddress);
-        WidgetStructure.getAddressObj(childAddress).addressID = childAddress.toString();
-        
-        return childAddress;
+        let currentObject = WidgetStructure.getAddressObj(childAddress);
+        currentObject.hide = WidgetStructure.getHideFunction(childAddress);
+        currentObject.display = WidgetStructure.getDisplayFunction(childAddress);
+        currentObject.address = childAddress;
+        currentObject.addressID = 'WidgetStructure_' + childAddress.toString().replaceAll(',', '');
+
+        currentObject.divCode.id = currentObject.addressID;
+        return WidgetStructure.getAddressObj(childAddress);
     }
 
     static getAddressesOfChildren(parentAddress){
@@ -325,6 +342,7 @@ export class WidgetStructure{
         window.getAddressObj = WidgetStructure.getAddressObj;
         window.triggerResizeEvent = WidgetStructure.triggerResizeEvent;
 
+        console.log(WidgetStructure.widgetTree)
         let f = 'let address = [' + address + ']; let children = getChildren(address); children.reverse(); children.push(address); children.forEach((child) => {let widgetObj = getAddressObj(address); let parentID; if(widgetObj.parentID === undefined){parentID = widgetObj.addressID.slice(0,-1);}else{parentID = widgetObj.parentID.concat([]);} document.getElementById(parentID).appendChild(widgetObj.divCode); widgetObj.hidden = false}); triggerResizeEvent();'
         f = new Function(f)
 

@@ -23,8 +23,11 @@ export class WidgetsOnGrid{
 
 
         //create the grid
-        new WidgetStructure(targetDivID, gridID, ManageGrid.main.getGridEl(gridInstance));
-        let gridParentObjAddr = WidgetStructure.getLastest();
+        const parentTreeStructure = new WidgetStructure(targetDivID, gridID, ManageGrid.main.getGridEl(gridInstance));
+        this.parentTreeStructure = parentTreeStructure;
+        WidgetStructure.getLastestObject().divCode.id = WidgetStructure.getLastestObject().addressID;
+
+        let gridParentObjAddr = WidgetStructure.getLastestAddress();
         gridInstance.treeStructAddr = gridParentObjAddr;
         window.onresize = WidgetsOnGrid.resizeHandler;
 
@@ -68,7 +71,8 @@ export class WidgetsOnGrid{
         let i = 0;
         while(1){
             if(WidgetsOnGrid.grid.instances[i] === undefined){break;}
-            WidgetsOnGrid.grid.instances[i].DivData = ManageGrid.main.update.size(WidgetsOnGrid.grid.instances[i]);
+            //WidgetsOnGrid.grid.instances[i].DivData = ManageGrid.main.update.size(WidgetsOnGrid.grid.instances[i]);
+            ManageGrid.main.update.size(WidgetsOnGrid.grid.instances[i]);
             i++;
         }
     }
@@ -79,15 +83,32 @@ export class WidgetsOnGrid{
         //combine those
         //slap it in widgetStructure
 
+        WidgetsOnGrid.fetchWidgetDataFromJson(widget);
 
     }
 
+    tempCreateTest(height = 2, width = 2, posX = 3, posY = 2){
+        console.log('TEST:')
+        let TLpos = {X: posX, Y: posY}
+        let element = ManageGrid.create.positionClass(this.gridInstance, width, height, TLpos);
 
-    static async fetchWidgetDataFromJson(widgetName, widgetID, instanceNum, retry = 0){
+        let _ = this.gridInstance.treeStructAddr;
+
+        let _0 = this.parentTreeStructure.createChild(_, element)
+        WidgetStructure.addCode(_0, 'background-color: white');
+        _0.display();
+
+        console.log(WidgetStructure.widgetTree)
+        console.log(_0)
+        console.log('!TEST')
+    }
+
+
+    static async fetchWidgetDataFromJson(widgetName, retry = 0){
         if(WidgetsOnGrid.grid.widgetSheet.busy == true){
             retry++;
-            if(retry ==  20){console.error('failed To  the Widget'); return;}
-            setTimeout( function(){WidgetsOnGrid.fetchWidgetDataFromJson(widgetName, instanceNum, retry)}, 100);
+            if(retry ==  20){console.error('failed To fetch the Widget'); return;}
+            setTimeout( function(){WidgetsOnGrid.fetchWidgetDataFromJson(widgetName, retry)}, 100);
             return;
         };
         console.log('fetching: ' + widgetName)
@@ -100,10 +121,7 @@ export class WidgetsOnGrid{
             else{
                 WidgetsOnGrid.grid.widgetSheet.busy = false;
 
-                let gridInstance = WidgetsOnGrid.grid.instances[instanceNum];
-                let testCode = new parseWidgetCode(out[widgetName], widgetID, gridInstance);
-                testCode = testCode.get();
-                WidgetsOnGrid.grid.widgetSheet.data.push(testCode);
+                WidgetsOnGrid.grid.widgetSheet.data.push(out[widgetName]);
                 
 
                 return;
