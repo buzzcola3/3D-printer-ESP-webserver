@@ -4,104 +4,109 @@ import {ManageGrid} from "./grid.js";
 import {parseWidgetCode} from "./WidgetJsonParser.js";
 
 export class WidgetsOnGrid{
-    constructor(targetDivID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit = 'px', family = 'none'){
-        this.gridSegmentWidth = gridSegmentWidth;
-        this.gridSegmentHeight = gridSegmentHeight;
-        this.gridSegmentTopGap = gridSegmentTopGap;
-        this.gridSegmentLeftGap = gridSegmentLeftGap;
-        this.targetDivID = targetDivID;
-        this.sizeUnit = sizeUnit;        
+    constructor(targetDivID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit = 'px'){
+        let gridSizes = {};
+        
+        gridSizes.gridSegmentWidth = gridSegmentWidth;
+        gridSizes.gridSegmentHeight = gridSegmentHeight;
+        gridSizes.gridSegmentTopGap = gridSegmentTopGap;
+        gridSizes.gridSegmentLeftGap = gridSegmentLeftGap;
+        gridSizes.targetDivID = targetDivID;
+        gridSizes.sizeUnit = sizeUnit;
 
+        this.gridSizes = gridSizes;
 
-        this.pushNewInstanceToList();
 
         let gridID = targetDivID + '_grid';
-        let instance = WidgetsOnGrid.assignInstanceNumber(targetDivID)
-
-        let gridInstance = WidgetsOnGrid.grid.instances[instance];
-        this.gridInstance = gridInstance;
 
 
-        //create the grid
-        const parentTreeStructure = new WidgetStructure(targetDivID, gridID, ManageGrid.main.getGridEl(gridInstance));
-        this.parentTreeStructure = parentTreeStructure;
-        WidgetStructure.getLastestObject().divCode.id = WidgetStructure.getLastestObject().addressID;
+        //create new structure with grid as root element
+        const gridMainClassOfTreeStructure = new WidgetStructure(targetDivID, gridID, ManageGrid.main.getGridEl(gridSizes));
+        this.gridMainClassOfTreeStructure = gridMainClassOfTreeStructure;
 
-        let gridParentObjAddr = WidgetStructure.getLastestAddress();
-        gridInstance.treeStructAddr = gridParentObjAddr;
+        //get the root element
+        let gridParentObj = WidgetStructure.getLastestObject();
+        gridParentObj.divCode.id = gridParentObj.addressID;
+        gridParentObj.gridSizes = gridSizes;
+        this.gridParentObj = gridParentObj;
+
+        //add to list of grids
+        WidgetsOnGrid.gridList.push(gridParentObj.address);
+
+        
         window.onresize = WidgetsOnGrid.resizeHandler;
 
-        WidgetsOnGrid.displayGridOnScreen(gridParentObjAddr);
+        gridParentObj.display();
+
+        //console.log(WidgetStructure.widgetTree);
+        console.log(WidgetsOnGrid.gridList);
     }
+
+    static appendSubGridCode(targetObj, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit = 'px'){
+        let gridSizes = {};
+        
+        gridSizes.gridSegmentWidth = gridSegmentWidth;
+        gridSizes.gridSegmentHeight = gridSegmentHeight;
+        gridSizes.gridSegmentTopGap = gridSegmentTopGap;
+        gridSizes.gridSegmentLeftGap = gridSegmentLeftGap;
+        gridSizes.targetDivID = targetObj.addressID;
+        gridSizes.sizeUnit = sizeUnit;
+
+        this.gridSizes = gridSizes;
+
+        targetObj.gridSizes = gridSizes;
+
+        ManageGrid.main.getGridEl(gridSizes, targetObj.divCode)
+        
+        WidgetsOnGrid.gridList.push(targetObj.address);
+
+        return targetObj;
+    }
+
+    static gridList = [] //stores element ID of each grid
 
     static grid = {instances: [], widgetSheet: {data: [], busy: false}};
-    pushNewInstanceToList(){
-        WidgetsOnGrid.grid.instances.push({
-            treeStructAddr: undefined,
-            targetDivID: this.targetDivID,
-            gridSegmentWidth: this.gridSegmentWidth,
-            gridSegmentHeight: this.gridSegmentHeight,
-            gridSegmentTopGap: this.gridSegmentTopGap,
-            gridSegmentLeftGap: this.gridSegmentLeftGap,
-            sizeUnit: this.sizeUnit,
-            gridWidth: undefined,
-            gridHeight: undefined,
-        });
-    }
-
-    static assignInstanceNumber(targetDivID){
-        let i = 0;
-        
-        while(1){
-            if(WidgetsOnGrid.grid.instances[i].targetDivID === undefined){console.warn('instance could not be assigned'); return -1;}
-            if(WidgetsOnGrid.grid.instances[i].targetDivID == targetDivID){return i;}
-            i++;
-        } 
-    }
-
-    static displayGridOnScreen(gridParentObjAddr){
-        WidgetStructure.getAddressObj(gridParentObjAddr).display();  
-    }
-
-    static hideGridOnScreen(gridParentObjAddr){
-        WidgetStructure.getAddressObj(gridParentObjAddr).hide();  
-    }
 
     static resizeHandler(){ //mainGrid
-        let i = 0;
-        while(1){
-            if(WidgetsOnGrid.grid.instances[i] === undefined){break;}
-            //WidgetsOnGrid.grid.instances[i].DivData = ManageGrid.main.update.size(WidgetsOnGrid.grid.instances[i]);
-            ManageGrid.main.update.size(WidgetsOnGrid.grid.instances[i]);
-            i++;
-        }
+        WidgetsOnGrid.gridList.forEach((gridAddr) => {
+            ManageGrid.main.update.size(WidgetStructure.getAddressObj(gridAddr).divCode, WidgetStructure.getAddressObj(gridAddr).gridSizes);
+        })
     }
 
-    create(widget, height, width, posX, posY){
-        //get position code
-        //get widget code
-        //combine those
-        //slap it in widgetStructure
+    createWidget(widget, height, width, posX, posY){
+
+        let _0 = WidgetStructure.createChild(this.gridParentObj.address)
+    
+        ManageGrid.create.positionClass(this.gridSizes, 2, 2, {X:2, Y:2}, _0.divCode)
+        
+        let _00 = WidgetStructure.createChild(_0.address)
+        WidgetsOnGrid.appendSubGridCode(_00, 20, 20, 2, 2);
+
+        _0.display();
+        _00.display();
 
         WidgetsOnGrid.fetchWidgetDataFromJson(widget);
 
     }
 
-    tempCreateTest(height = 2, width = 2, posX = 3, posY = 2){
-        console.log('TEST:')
-        let TLpos = {X: posX, Y: posY}
-        let element = ManageGrid.create.positionClass(this.gridInstance, width, height, TLpos);
-
-        let _ = this.gridInstance.treeStructAddr;
-
-        let _0 = this.parentTreeStructure.createChild(_, element)
-        WidgetStructure.addCode(_0, 'background-color: white');
-        _0.display();
-
-        console.log(WidgetStructure.widgetTree)
-        console.log(_0)
-        console.log('!TEST')
-    }
+//    tempCreateTest(height = 2, width = 2, posX = 3, posY = 2){
+//        console.log('TEST:')
+//        let TLpos = {X: posX, Y: posY}
+//
+//        let _ = this.gridInstance.treeStructAddr;
+//
+//        let element = ManageGrid.create.positionClass(this.gridInstance, width, height, TLpos);
+//        let _0 = this.gridMainClassOfTreeStructure.createChild(_, element)
+//        
+//
+//        _0.display();
+//        let widgetEX = new WidgetsOnGrid(_0.addressID, 27, 27, 0, 0);
+//        widgetEX.tempCreateTest2();
+//
+//        console.log(WidgetStructure.widgetTree)
+//        console.log(_0)
+//        console.log('!TEST')
+//    }
 
 
     static async fetchWidgetDataFromJson(widgetName, retry = 0){

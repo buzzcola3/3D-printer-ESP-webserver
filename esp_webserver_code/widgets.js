@@ -40,6 +40,7 @@ export class WidgetStructure{
             ID: parentID + '_' + widgetName,
             parentID: parentID,
             addressID: 'WidgetStructure_' + freeBranch.toString().replaceAll(',', '_'),
+            address: [freeBranch],
             hidden: true,
             hide: WidgetStructure.getHideFunction([freeBranch]),
             divCode: divCode
@@ -122,7 +123,7 @@ export class WidgetStructure{
         //WidgetStructure.widgetTree = funOut.widgetTree
     }
     
-    createChild(parentAddress = [], childNode = document.createElement('div')){ //<-- [0,0]
+    static createChild(parentAddress = [], childNode = document.createElement('div')){ //<-- [0,0]
 
         let structureRef = WidgetStructure.addressToWidgetStructure(parentAddress);
         console.log('making child for: ' + parentAddress);
