@@ -75,17 +75,21 @@ export class WidgetsOnGrid{
 
     createWidget(widget, height, width, posX, posY){
 
+        //fetch widget
+
+        //prepare
+        WidgetsOnGrid.fetchWidgetDataFromJson(widget);
+
         let _0 = WidgetStructure.createChild(this.gridParentObj.address)
     
-        ManageGrid.create.positionClass(this.gridSizes, 2, 2, {X:2, Y:2}, _0.divCode)
+        ManageGrid.create.positionClass(this.gridSizes, 2, 2, {X:2, Y:2}, _0.divCode) //remove grid sizes --> SEARCH FOR PARENT WITH gridSizes and apply it
         
         let _00 = WidgetStructure.createChild(_0.address)
-        WidgetsOnGrid.appendSubGridCode(_00, 20, 20, 2, 2);
+        WidgetsOnGrid.appendSubGridCode(_00, 20, 20, 2, 2); 
 
         _0.display();
-        _00.display();
 
-        WidgetsOnGrid.fetchWidgetDataFromJson(widget);
+        
 
     }
 

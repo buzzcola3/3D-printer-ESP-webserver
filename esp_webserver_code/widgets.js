@@ -303,7 +303,7 @@ export class WidgetStructure{
         //children.reverse();
 
         //children.forEach((child) => {
-            //let widgetObj = getAddressObj(address);
+            //let widgetObj = getAddressObj(child);
             
             //if(widgetObj.parentID === undefined){let parentID = widgetObj.addressID.slice(0,-1);}
             //else{let parentID = widgetObj.parentID.concat([]);}
@@ -315,7 +315,7 @@ export class WidgetStructure{
         window.getChildren = WidgetStructure.getChildren;
         window.getAddressObj = WidgetStructure.getAddressObj;
 
-        let f = 'let address = [' + address + ']; let children = getChildren(address); children.unshift(address); children.forEach((child) => {let widgetObj = getAddressObj(address); let parentID; if(widgetObj.parentID === undefined){parentID = widgetObj.addressID.slice(0,-1);}else{parentID = widgetObj.parentID.concat([]);} document.getElementById(widgetObj.divCode.id).remove(); widgetObj.hidden = true}); triggerResizeEvent();'
+        let f = 'let address = [' + address + ']; let children = getChildren(address); children.unshift(address); children.forEach((child) => {let widgetObj = getAddressObj(child); let parentID; if(widgetObj.parentID === undefined){parentID = widgetObj.addressID.slice(0,-1);}else{parentID = widgetObj.parentID.concat([]);} document.getElementById(widgetObj.divCode.id).remove(); widgetObj.hidden = true}); triggerResizeEvent();'
         //let f = 'let address = [' + address + ']; let children = getChildren(address); children.reverse(); children.push(address); children.forEach((child) => {getAddressObj(child).hidden = true});'
         f = new Function(f)
 
@@ -329,7 +329,7 @@ export class WidgetStructure{
         //children.reverse();
 
         //children.forEach((child) => {
-            //let widgetObj = getAddressObj(address);
+            //let widgetObj = getAddressObj(child);
             
             //if(widgetObj.parentID === undefined){let parentID = widgetObj.addressID.slice(0,-1);}
             //else{let parentID = widgetObj.parentID.concat([]);}
@@ -344,7 +344,7 @@ export class WidgetStructure{
         window.triggerResizeEvent = WidgetStructure.triggerResizeEvent;
 
         console.log(WidgetStructure.widgetTree)
-        let f = 'let address = [' + address + ']; let children = getChildren(address); children.reverse(); children.push(address); children.forEach((child) => {let widgetObj = getAddressObj(address); let parentID; if(widgetObj.parentID === undefined){parentID = widgetObj.addressID.slice(0,-1);}else{parentID = widgetObj.parentID.concat([]);} document.getElementById(parentID).appendChild(widgetObj.divCode); widgetObj.hidden = false}); triggerResizeEvent();'
+        let f = 'let address = [' + address + ']; let children = getChildren(address); children.push(address); children.reverse(); children.forEach((child) => {let widgetObj = getAddressObj(child); let parentID; if(widgetObj.parentID === undefined){parentID = widgetObj.addressID.slice(0,-1);}else{parentID = widgetObj.parentID.concat([]);} document.getElementById(parentID).appendChild(widgetObj.divCode); widgetObj.hidden = false}); triggerResizeEvent();'
         f = new Function(f)
 
         return f;
