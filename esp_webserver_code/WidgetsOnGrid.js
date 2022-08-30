@@ -1,7 +1,7 @@
 import {addLineOfcode} from "./ManageCode.js";
 import {WidgetStructure} from "./widgets.js";
 import {ManageGrid} from "./grid.js";
-import {parseWidgetCode} from "./WidgetJsonParser.js";
+import {WidgetJsonParser} from "./WidgetJsonParser.js";
 
 export class WidgetsOnGrid{
     constructor(targetDivID, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit = 'px'){
@@ -44,7 +44,8 @@ export class WidgetsOnGrid{
 
     static appendSubGridCode(targetObj, gridSegmentWidth, gridSegmentHeight, gridSegmentTopGap, gridSegmentLeftGap, sizeUnit = 'px'){
         let gridSizes = {};
-        
+        if((targetObj.gridSizes === undefined) == 0){gridSizes = targetObj.gridSizes}
+
         gridSizes.gridSegmentWidth = gridSegmentWidth;
         gridSizes.gridSegmentHeight = gridSegmentHeight;
         gridSizes.gridSegmentTopGap = gridSegmentTopGap;
@@ -57,6 +58,10 @@ export class WidgetsOnGrid{
         targetObj.gridSizes = gridSizes;
 
         ManageGrid.main.getGridEl(gridSizes, targetObj.divCode)
+
+        console.log(targetObj.divCode.className)
+
+        //if(classText.includes('width__') && classText.includes('height__')){return targetObj;}
         
         WidgetsOnGrid.gridList.push(targetObj.address);
 
@@ -69,7 +74,9 @@ export class WidgetsOnGrid{
 
     static resizeHandler(){ //mainGrid
         WidgetsOnGrid.gridList.forEach((gridAddr) => {
-            ManageGrid.main.update.size(WidgetStructure.getAddressObj(gridAddr).divCode, WidgetStructure.getAddressObj(gridAddr).gridSizes);
+            ManageGrid.update.sizePx(WidgetStructure.getAddressObj(gridAddr))
+            ManageGrid.update.updateGridSize(WidgetStructure.getAddressObj(gridAddr))
+            //ManageGrid.main.update.size(WidgetStructure.getAddressObj(gridAddr), WidgetStructure.getAddressObj(gridAddr).gridSizes);
         })
     }
 
@@ -78,46 +85,73 @@ export class WidgetsOnGrid{
         //fetch widget
 
         //prepare
-        WidgetsOnGrid.fetchWidgetDataFromJson(widget);
+        WidgetsOnGrid.fetchWidgetDataFromJson(widget, this.gridParentObj, height, width, {X: posX, Y: posY});
 
-        let _0 = WidgetStructure.createChild(this.gridParentObj.address)
+        //let _0 = WidgetsOnGrid.cw_createEmptyChild(this.gridParentObj, width, height, {X:posX, Y:posY})
     
-        ManageGrid.create.positionClass(this.gridSizes, 2, 2, {X:2, Y:2}, _0.divCode) //remove grid sizes --> SEARCH FOR PARENT WITH gridSizes and apply it
-        
-        let _00 = WidgetStructure.createChild(_0.address)
-        WidgetsOnGrid.appendSubGridCode(_00, 20, 20, 2, 2); 
+        //ManageGrid.create.positionClass(this.gridSizes, width, height, {X:posX, Y:posY}, _0.divCode) //remove grid sizes --> SEARCH FOR PARENT WITH gridSizes and apply it
+        //WidgetsOnGrid.cw_createEmptyObject(this.gridParentObj, width, height, {X:posX, Y:posY})
 
-        _0.display();
+        //let _00 = WidgetsOnGrid.cw_createGridChild(_0);
+
+        //let _000 = WidgetsOnGrid.cw_createEmptyChild(_00, 1, 1, {X:1, Y:1})
+
+        //let _0000 = WidgetsOnGrid.cw_createGridChild(_000, {gridSegmentHeight: 22, gridSegmentWidth: 22, gridSegmentTopGap: 3, gridSegmentLeftGap: 3, sizeUnit: 'px'})
 
         
+        //console.log(_0.address.toString());
+        //console.log(_00.address.toString());
+
+        //_0.display();
 
     }
 
-//    tempCreateTest(height = 2, width = 2, posX = 3, posY = 2){
-//        console.log('TEST:')
-//        let TLpos = {X: posX, Y: posY}
-//
-//        let _ = this.gridInstance.treeStructAddr;
-//
-//        let element = ManageGrid.create.positionClass(this.gridInstance, width, height, TLpos);
-//        let _0 = this.gridMainClassOfTreeStructure.createChild(_, element)
-//        
-//
-//        _0.display();
-//        let widgetEX = new WidgetsOnGrid(_0.addressID, 27, 27, 0, 0);
-//        widgetEX.tempCreateTest2();
-//
-//        console.log(WidgetStructure.widgetTree)
-//        console.log(_0)
-//        console.log('!TEST')
-//    }
+    static cw_createGridChild(addressObj, gridSize = WidgetsOnGrid.inheritGridSize(addressObj)){
+        let childObj = WidgetStructure.createChild(addressObj.address);
+        WidgetsOnGrid.appendSubGridCode(childObj, gridSize.gridSegmentWidth, gridSize.gridSegmentHeight, gridSize.gridSegmentTopGap, gridSize.gridSegmentLeftGap);
+        return childObj
+    }
 
+    static cw_addGridCode(addressObj, gridSize = WidgetsOnGrid.inheritGridSize(addressObj)){
+        WidgetsOnGrid.appendSubGridCode(addressObj, gridSize.gridSegmentWidth, gridSize.gridSegmentHeight, gridSize.gridSegmentTopGap, gridSize.gridSegmentLeftGap);
+        return addressObj;
+    }
 
-    static async fetchWidgetDataFromJson(widgetName, retry = 0){
+    static cw_createEmptyChild(addressObj, width, height, topLeft,){
+        let childObj = WidgetStructure.createChild(addressObj.address)
+        ManageGrid.create.positionClass(WidgetsOnGrid.inheritGridSize(childObj), width, height, topLeft, childObj)
+        return childObj;
+    }
+
+    static cw_addCode(addressObj, code){
+        return WidgetStructure.addCode(addressObj, code);
+    }
+
+    static inheritGridSize(currentObject){ //get gridsize of the parent, if it doesnt have gridSize get the gridSize of it's parent
+        console.log(currentObject)
+        let address = currentObject.address.concat([]);
+        address.pop();
+        if(address.length == 0){console.warn("Unable to inherit size, attempting to return current size"); return currentObject.gridSizes;}
+
+        while(WidgetStructure.getAddressObj(address).gridSizes === undefined){address.pop()}
+
+        return getAddressObj(address).gridSizes;
+    }
+
+    static example_widget = {
+        customGridSize: undefined,
+        widthInGrid: 1,
+        heightInGrid: 2,
+        position: {X:3, Y:4},
+        construction: undefined
+
+    }
+
+    static async fetchWidgetDataFromJson(widgetName, parentObj, height, width, topLeft, retry = 0){
         if(WidgetsOnGrid.grid.widgetSheet.busy == true){
             retry++;
             if(retry ==  20){console.error('failed To fetch the Widget'); return;}
-            setTimeout( function(){WidgetsOnGrid.fetchWidgetDataFromJson(widgetName, retry)}, 100);
+            setTimeout( function(){WidgetsOnGrid.fetchWidgetDataFromJson(widgetName, parentObj, height, width, topLeft, retry)}, 100);
             return;
         };
         console.log('fetching: ' + widgetName)
@@ -131,6 +165,14 @@ export class WidgetsOnGrid{
                 WidgetsOnGrid.grid.widgetSheet.busy = false;
 
                 WidgetsOnGrid.grid.widgetSheet.data.push(out[widgetName]);
+
+                let _0 = WidgetsOnGrid.cw_createEmptyChild(parentObj, width, height, topLeft)
+
+
+                WidgetJsonParser.parse(_0, out[widgetName]);
+                
+
+                _0.display();
                 
 
                 return;
