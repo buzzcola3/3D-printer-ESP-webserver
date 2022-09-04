@@ -35,139 +35,6 @@ export var ManageGrid = {
             return element;
         },
 
-        update: {
-//            size: function(element_targetObj, sizes = {}){ //gridElement to check the size, modify and return, sizes to speed up the process 
-//
-//                if(document.getElementById(element_targetObj.divCode.id) === null){return element_targetObj};
-//                
-//                //if(size === undefined){extract sizes from gridElement}
-//                //else use the sizes
-//                console.log("DELDELDLEDLELDLELDLEDE")
-//
-//                //check for width and height classes
-//                let sizeClassName = {};
-//                let classList = element_targetObj.divCode.classList;
-//
-//                classList.forEach(className => {
-//                    if(className.includes('height__')){
-//                        sizeClassName.height = className.replace('height__', '')
-//                        sizeClassName.height = parseInt(sizeClassName.height);
-//
-//                        sizes.elementHeight = sizeClassName.height
-//
-//                        sizeClassName.sizeUnit = className.replace('height__' + sizeClassName.height, '');
-//                    }
-//
-//                    if(className.includes('width__')){
-//                        sizeClassName.width = className.replace('width__', '')
-//                        sizeClassName.width = parseInt(sizeClassName.width)
-//
-//                        sizes.elementWidth = sizeClassName.width;
-//                        
-//                        sizeClassName.sizeUnit = className.replace('width__' + sizeClassName.width, '');
-//                    }
-//                })
-//                if(sizes.elementWidth === undefined){sizeClassName.width = 0;}
-//                if(sizes.elementHeight === undefined){sizeClassName.height = 0;}
-//                console.log(sizeClassName.width)
-//                console.log(sizeClassName.height)
-//                
-//
-//
-//                let oldHeight = sizes.gridHeight;
-//                let oldWidth = sizes.gridWidth;
-//                if(oldHeight === undefined){oldHeight = 0;}
-//                if(oldWidth === undefined){oldWidth = 0}
-//
-//                ManageGrid.main.updateSizes(element_targetObj, sizes);
-//
-//                let newHeight = sizes.gridHeight
-//                let newWidth = sizes.gridWidth
-//
-//                //let newDivData = WidgetStructure.getAddressObj(instance.treeStructAddr).divCode;
-//
-//                if(oldHeight == newHeight && oldWidth == newWidth){return element_targetObj;}
-//
-//
-//                replaceLineOfCode(element_targetObj.divCode, 'grid-template-columns: repeat(' + oldWidth + ',' + sizes.gridSegmentWidth + sizes.sizeUnit + ')', 'grid-template-columns: repeat(' + newWidth + ',' + sizes.gridSegmentWidth + sizes.sizeUnit + ')');
-//                replaceLineOfCode(element_targetObj.divCode, 'grid-template-rows: repeat('+ oldHeight +',' + sizes.gridSegmentHeight + sizes.sizeUnit + ')','grid-template-rows: repeat('+ newHeight +',' + sizes.gridSegmentHeight + sizes.sizeUnit + ')');
-//
-//                return element_targetObj;
-//            },
-
-        },
-
-        get: {
-//            height: function(gridElement, sizes){
-//                //let displayHeight = window.innerHeight;
-//
-//                let divHeight;
-//
-//                if(sizes.elementWidth === undefined){
-//                    divHeight = gridElement.parentElement.clientHeight;
-//                }else{
-//                    divHeight = sizes.elementHeight;
-//                }
-//
-//
-//                let oneGrid = sizes.gridSegmentHeight;
-//                let oneGap = sizes.gridSegmentTopGap;
-//
-//                let i = 0;
-//                while(1){
-//                    if(divHeight < oneGrid){break;}
-//                    divHeight = divHeight - (oneGrid + oneGap);
-//                    i++;
-//                }
-//                if(divHeight > sizes.gridSegmentHeight + (2*sizes.gridSegmentTopGap)){i++;}
-//                return i;
-//            },
-//
-//            width: function(gridElement, sizes){
-//                //let displayWidth = window.innerWidth;
-//                let divWidth;
-//
-//                if(sizes.elementWidth === undefined){
-//                    divWidth = gridElement.parentElement.clientWidth;
-//                }else{
-//                    divWidth = sizes.elementWidth;
-//                }
-//                console.log(divWidth)
-//
-//                let oneGrid = sizes.gridSegmentWidth;
-//                let oneGap = sizes.gridSegmentLeftGap;
-//
-//                let i = 0;
-//                while(1){
-//                    if(divWidth < oneGrid){break;}
-//                    divWidth = divWidth - (oneGrid + oneGap);
-//                    i++;
-//                }
-//                if(divWidth > sizes.gridSegmentHeight + (2*sizes.gridSegmentTopGap)){i++;}
-//                return i;
-//            },
-//
-//            heightPx: function(instance){
-//                let oneGrid = instance.gridSegmentHeight;
-//                let oneGap = instance.gridSegmentLeftGap;
-//                let gridNumber = instance.gridHeight;
-//                let gapNumber = gridNumber-1;
-//
-//                let totalSize = (oneGap*gapNumber) + (oneGrid*gridNumber)
-//                return totalSize;
-//            },
-//
-//            widthPx: function(instance){
-//                let oneGrid = instance.gridSegmentWidth;
-//                let oneGap = instance.gridSegmentTopGap;
-//                let gridNumber = instance.gridWidth;
-//                let gapNumber = gridNumber-1;
-//
-//                let totalSize = (oneGap*gapNumber) + (oneGrid*gridNumber)
-//                return totalSize;
-//            },
-        },
-
         updateSizeFromDOM: function(element_targetObj){
             if(document.getElementById(element_targetObj.divCode.id) === null){return element_targetObj};
                 
@@ -200,40 +67,6 @@ export var ManageGrid = {
             if(sizes.elementWidth == undefined){sizeClassName.width = 0;}
             if(sizes.elementHeight == undefined){sizeClassName.height = 0;}
         },
-
-//        updateSizes: function(targetObj, sizes){
-//            let heightPx;
-//            let widthPx;
-//
-//
-//            let oldHeightPx = ManageGrid.main.get.heightPx(sizes);
-//            let oldWidthPx = ManageGrid.main.get.widthPx(sizes);
-//
-//            console.log(targetObj.gridSizes)
-//            
-//
-//            sizes.gridHeight = ManageGrid.main.get.height(targetObj.divCode, sizes);
-//            sizes.gridWidth = ManageGrid.main.get.width(targetObj.divCode, sizes);
-//        
-//
-//            heightPx = ManageGrid.main.get.heightPx(sizes)
-//            widthPx = ManageGrid.main.get.widthPx(sizes)
-//
-//            let unit = sizes.sizeUnit;
-//            //gridElement.setAttribute('style', 'width: ' + widthPx + unit +'; height: ' + heightPx + unit + ';');
-//            
-//            
-//
-//            if(oldWidthPx != widthPx){
-//                WidgetStructure.removeCode(targetObj, 'width: ' + oldWidthPx + unit + ';');
-//                WidgetStructure.addCode(targetObj, 'width: ' + widthPx + unit + ';');
-//            }
-//            if(oldHeightPx != heightPx){
-//                WidgetStructure.removeCode(targetObj, 'height: ' + oldHeightPx + unit + ';');
-//                WidgetStructure.addCode(targetObj, 'height: ' + heightPx + unit + ';');
-//            }
-//
-//        },
     },
 
     create: {
@@ -301,17 +134,35 @@ export var ManageGrid = {
     },
 
     update: {
+        size: function(targetObj){
+            let oldGridMaxFitElementHeight = targetObj.gridSizes.gridMaxFitElementHeight;
+            let oldGridMaxFitElementWidth = targetObj.gridSizes.gridMaxFitElementWidth;
+
+            this.sizePx(targetObj);
+            this.updateElementSize(targetObj)
+            this.updateGridElementSize(targetObj);
+            
+
+            let newGridMaxFitElementHeight = targetObj.gridSizes.gridMaxFitElementHeight;
+            let newGridMaxFitElementWidth = targetObj.gridSizes.gridMaxFitElementWidth;
+
+            let targetDiv = targetObj.divCode;
+            let sizeUnit = targetObj.gridSizes.sizeUnit;
+
+            if(oldGridMaxFitElementHeight != newGridMaxFitElementHeight){
+                removeLineOfcode(targetDiv, 'height: ' + oldGridMaxFitElementHeight + sizeUnit);
+                addLineOfcode(targetDiv, 'height: ' + newGridMaxFitElementHeight + sizeUnit);
+            }
+
+            if(oldGridMaxFitElementWidth != newGridMaxFitElementWidth){
+                removeLineOfcode(targetDiv, 'width: ' + oldGridMaxFitElementWidth + sizeUnit);
+                addLineOfcode(targetDiv, 'width: ' + newGridMaxFitElementWidth + sizeUnit);
+            }   
+        },
+
         sizePx: function(targetObj, inheritedSize = targetObj.gridSizes){
 
-            function updateSize(targetObj, oldSizeW, oldSizeH, newSizeW, newSizeH, sizeUnit){
-                let targetDiv = targetObj.divCode;
-
-                removeLineOfcode(targetDiv, 'height: ' + oldSizeH + sizeUnit);
-                removeLineOfcode(targetDiv, 'width: ' + oldSizeW + sizeUnit);
-    
-                addLineOfcode(targetDiv, 'height: ' + newSizeH + sizeUnit);
-                addLineOfcode(targetDiv, 'width: ' + newSizeW + sizeUnit);
-    
+            function updateSize(targetObj, newSizeW, newSizeH){
                 targetObj.gridSizes.elementHeight = newSizeH;
                 targetObj.gridSizes.elementWidth = newSizeW;
             }
@@ -325,13 +176,10 @@ export var ManageGrid = {
 
             if(spanOnParentW === undefined || spanOnParentH === undefined){
                 console.warn("spanOnParent is invalid, trying to use values from DOM");
-                let oldHeight = targetObj.gridSizes.elementHeight;
-                let oldWidth = targetObj.gridSizes.elementWidth;
                 let newHeight = targetObj.divCode.parentElement.offsetHeight;
                 let newWidth = targetObj.divCode.parentElement.offsetWidth;
-                let sizeUnit = targetObj.gridSizes.sizeUnit;
 
-                updateSize(targetObj, oldWidth, oldHeight, newWidth, newHeight, sizeUnit);
+                updateSize(targetObj, newWidth, newHeight);
 
                 targetObj.gridSizes.elementHeight = newHeight;
                 targetObj.gridSizes.elementWidth = newWidth;
@@ -341,32 +189,61 @@ export var ManageGrid = {
 
             let newHeight = (parentGridSizes.gridSegmentHeight*spanOnParentH) + (parentGridSizes.gridSegmentTopGap*(spanOnParentH-1))
             let newWidth = (parentGridSizes.gridSegmentWidth*spanOnParentW) + (parentGridSizes.gridSegmentLeftGap*(spanOnParentW-1) )
-            let oldHeight = targetObj.gridSizes.elementHeight;
-            let oldWidth = targetObj.gridSizes.elementWidth;
 
-            let sizeUnit = targetObj.gridSizes.sizeUnit;
-
-            updateSize(targetObj, oldWidth, oldHeight, newWidth, newHeight, sizeUnit);
-
-            console.log(oldHeight)
-            console.log(newWidth)
+            updateSize(targetObj, newWidth, newHeight);
 
             return;
         },
 
-        updateGridSize: function(targetObj){
+        updateElementSize: function(targetObj){
             console.log(targetObj.gridSizes);
-            this.height(targetObj);
-            this.width(targetObj);
 
-            removeLineOfcode(targetObj.divCode, 'grid-template-columns: repeat(' + targetObj.gridSizes.numberOfSegmentsWidth + ',' + targetObj.gridSizes.gridSegmentWidth + targetObj.gridSizes.sizeUnit + ')')
-            removeLineOfcode(targetObj.divCode, 'grid-template-rows: repeat('+ targetObj.gridSizes.numberOfSegmentsHeight +',' + targetObj.gridSizes.gridSegmentHeight + targetObj.gridSizes.sizeUnit + ')');
+            let oldWidth = targetObj.gridSizes.numberOfSegmentsWidth
+            let oldHeight = targetObj.gridSizes.numberOfSegmentsHeight
 
-            targetObj.gridSizes.numberOfSegmentsWidth = this.width(targetObj);
-            targetObj.gridSizes.numberOfSegmentsHeight = this.height(targetObj);
 
-            addLineOfcode(targetObj.divCode, 'grid-template-columns: repeat(' + targetObj.gridSizes.numberOfSegmentsWidth + ',' + targetObj.gridSizes.gridSegmentWidth + targetObj.gridSizes.sizeUnit + ')');
-            addLineOfcode(targetObj.divCode, 'grid-template-rows: repeat('+ targetObj.gridSizes.numberOfSegmentsHeight +',' + targetObj.gridSizes.gridSegmentHeight + targetObj.gridSizes.sizeUnit + ')');
+            let newWidth = this.width(targetObj);
+            let newHeight = this.height(targetObj);
+
+
+            if(oldHeight != newHeight){
+
+                removeLineOfcode(targetObj.divCode, 'grid-template-rows: repeat('+ oldHeight +',' + targetObj.gridSizes.gridSegmentHeight + targetObj.gridSizes.sizeUnit + ')');
+                
+                targetObj.gridSizes.numberOfSegmentsHeight = newHeight;
+
+                addLineOfcode(targetObj.divCode, 'grid-template-rows: repeat('+ newHeight +',' + targetObj.gridSizes.gridSegmentHeight + targetObj.gridSizes.sizeUnit + ')');
+            }
+
+            if(oldWidth != newWidth){
+                removeLineOfcode(targetObj.divCode, 'grid-template-columns: repeat(' + oldWidth + ',' + targetObj.gridSizes.gridSegmentWidth + targetObj.gridSizes.sizeUnit + ')')
+
+                targetObj.gridSizes.numberOfSegmentsWidth = newWidth;
+    
+                addLineOfcode(targetObj.divCode, 'grid-template-columns: repeat(' + newWidth + ',' + targetObj.gridSizes.gridSegmentWidth + targetObj.gridSizes.sizeUnit + ')');
+    
+            }
+        },
+
+        updateGridElementSize: function(targetObj){
+            let gap;
+            let segmentSize;
+            let numberOfSegments;
+
+            gap = targetObj.gridSizes.gridSegmentLeftGap;
+            segmentSize = targetObj.gridSizes.gridSegmentWidth;
+            numberOfSegments = targetObj.gridSizes.numberOfSegmentsWidth;
+            let realWidth = (segmentSize*numberOfSegments) + (gap*(numberOfSegments-1));
+
+            gap = targetObj.gridSizes.gridSegmentTopGap;
+            segmentSize = targetObj.gridSizes.gridSegmentHeight;
+            numberOfSegments = targetObj.gridSizes.numberOfSegmentsHeight;
+            let realHeight = (segmentSize*numberOfSegments) + (gap*(numberOfSegments-1));
+
+            console.log("gap: " + gap +" segmentSize: " + segmentSize + " numberOfSegments: " + numberOfSegments)
+
+            targetObj.gridSizes.gridMaxFitElementHeight = realHeight;
+            targetObj.gridSizes.gridMaxFitElementWidth = realWidth;
 
         },
 
@@ -391,17 +268,23 @@ export var ManageGrid = {
         width: function(targetObj){
             //let displayWidth = window.innerWidth;
             let divWidth = targetObj.gridSizes.elementWidth;
+            console.log(divWidth)
 
             let oneGrid = targetObj.gridSizes.gridSegmentWidth;
             let oneGap = targetObj.gridSizes.gridSegmentLeftGap;
+            let onePair = oneGap + oneGrid;
 
             let i = 0;
             while(1){
-                if(divWidth < oneGrid){break;}
-                divWidth = divWidth - (oneGrid + oneGap);
+                if(divWidth <= onePair){break;}
+                divWidth = divWidth - (onePair);
                 i++;
+                console.log(i)
             }
-            if(divWidth > targetObj.gridSizes.gridSegmentHeight + (2*targetObj.gridSizes.gridSegmentTopGap)){i++;}
+            if(divWidth > oneGrid){i++;}
+            console.log(divWidth)
+            console.log(onePair)
+            console.log(i)
             return i;
         },
 

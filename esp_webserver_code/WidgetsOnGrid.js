@@ -74,8 +74,9 @@ export class WidgetsOnGrid{
 
     static resizeHandler(){ //mainGrid
         WidgetsOnGrid.gridList.forEach((gridAddr) => {
-            ManageGrid.update.sizePx(WidgetStructure.getAddressObj(gridAddr))
-            ManageGrid.update.updateGridSize(WidgetStructure.getAddressObj(gridAddr))
+            ManageGrid.update.size(WidgetStructure.getAddressObj(gridAddr))
+            //ManageGrid.update.updateElementSize(WidgetStructure.getAddressObj(gridAddr))
+            //ManageGrid.update.updateGridElementSize(WidgetStructure.getAddressObj(gridAddr))
             //ManageGrid.main.update.size(WidgetStructure.getAddressObj(gridAddr), WidgetStructure.getAddressObj(gridAddr).gridSizes);
         })
     }

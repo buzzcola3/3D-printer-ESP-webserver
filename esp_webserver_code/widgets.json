@@ -30,7 +30,7 @@
     "widgetCreator": {
         "name": "widgetCreator",
         "sizeLimits": {"MinWidth": 6, "MaxWidth": 6, "MinHeight": 5, "MaxHeight": 5},
-        "widgetStructure": "$/$addCss$/$('background-color: white'); $/$addCss$/$('border-radius: 10px'); $/$subGrid$/$(20, 20, 4, 4);",
+        "widgetStructure": "$/$addCss$/$('background-color: white'); $/$addCss$/$('border-radius: 10px'); $/$subGrid$/$(20, 20, 4, 4){$/$createElement$/$()};",
 
         "shortenedValues": [],
         "jsSetup": "",
