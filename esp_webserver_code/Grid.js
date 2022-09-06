@@ -268,7 +268,7 @@ export var ManageGrid = {
         width: function(targetObj){
             //let displayWidth = window.innerWidth;
             let divWidth = targetObj.gridSizes.elementWidth;
-            console.log(divWidth)
+            
 
             let oneGrid = targetObj.gridSizes.gridSegmentWidth;
             let oneGap = targetObj.gridSizes.gridSegmentLeftGap;
@@ -279,12 +279,8 @@ export var ManageGrid = {
                 if(divWidth <= onePair){break;}
                 divWidth = divWidth - (onePair);
                 i++;
-                console.log(i)
             }
             if(divWidth > oneGrid){i++;}
-            console.log(divWidth)
-            console.log(onePair)
-            console.log(i)
             return i;
         },
 

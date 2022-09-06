@@ -132,31 +132,77 @@ export class WidgetJsonParser{
 
         switch(singleFunctionArrObj.type){
             case 'addCss':
-                console.log('addCss');
-                WidgetsOnGrid.cw_addCode(widgetObj, singleFunctionArrObj.arguments);
+                {
+                    console.log('addCss');
+                    WidgetsOnGrid.cw_addCode(widgetObj, singleFunctionArrObj.arguments);
+                }
                 break;
+
 
             case 'subGrid':
-                console.log('subGrid');
-                let argArr = singleFunctionArrObj.arguments.split(',')
-                
-                let gridSize = {};
-                argArr.forEach(arg => {
-                    if(parseInt(arg) != NaN){arg = parseInt(arg)}
-                    if(gridSize.gridSegmentWidth === undefined){gridSize.gridSegmentWidth = arg; return;}
-                    if(gridSize.gridSegmentHeight === undefined){gridSize.gridSegmentHeight = arg; return;}
-                    if(gridSize.gridSegmentTopGap === undefined){gridSize.gridSegmentTopGap = arg; return;}
-                    if(gridSize.gridSegmentLeftGap === undefined){gridSize.gridSegmentLeftGap = arg; return;}
-                    if(gridSize.sizeUnit === undefined){gridSize.sizeUnit = arg; return;}
-                })
-                console.log(gridSize);
-                WidgetsOnGrid.cw_addGridCode(widgetObj, gridSize);
+                {
+                    console.log('subGrid');
+                    let argArr = singleFunctionArrObj.arguments.split(',')
+                    
+                    let gridSize = {};
+                    argArr.forEach(arg => {
+                        if(parseInt(arg) != NaN){arg = parseInt(arg)}
+                        if(gridSize.gridSegmentWidth === undefined){gridSize.gridSegmentWidth = arg; return;}
+                        if(gridSize.gridSegmentHeight === undefined){gridSize.gridSegmentHeight = arg; return;}
+                        if(gridSize.gridSegmentTopGap === undefined){gridSize.gridSegmentTopGap = arg; return;}
+                        if(gridSize.gridSegmentLeftGap === undefined){gridSize.gridSegmentLeftGap = arg; return;}
+                        if(gridSize.sizeUnit === undefined){gridSize.sizeUnit = arg; return;}
+                    })
+                    console.log(gridSize);
+                    WidgetsOnGrid.cw_addGridCode(widgetObj, gridSize);
+                }
                 break;
 
+
             case 'createElement':
-                console.log('createElement');
-                relevantObj = createdChildObject;
+                {
+                    console.log('createElement');
+                    let argArr = singleFunctionArrObj.arguments.split(',');
+    
+                    console.log(singleFunctionArrObj)
+                    console.log(argArr);
+
+                    let width;
+                    let height;
+                    let tlX;
+                    let tlY;
+
+                    let argNum = 0;
+                    argArr.forEach(arg => {
+                        if(parseInt(arg) != NaN){arg = parseInt(arg)};
+                        switch(argNum){
+                            case 0:
+                                width = arg;
+                                break;
+
+                            case 1:
+                                height = arg;
+                                break;
+
+                            case 2:
+                                tlX = arg;
+                                break;
+
+                            case 3:
+                                tlY = arg;
+                                break;
+
+                            default:
+                                console.warn("Too many arguments");
+                                break;
+
+                        }
+                        argNum++;
+                    })
+                    relevantObj = WidgetsOnGrid.cw_createEmptyChild(widgetObj, width, height, {X: tlX, Y: tlY});
+                }
                 break;
+
 
         }
 
